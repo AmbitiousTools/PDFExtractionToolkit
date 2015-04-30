@@ -15,7 +15,6 @@ object Document {
   def fromPDFPath(path: URL): Document = {
     val pDDocument: PDDocument = PDDocument.load(path)
     val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages
-    pDDocument.close()
 
     val document: Document = new Document
     document.pages = Page.listFromPDPageList(allPDPages)
