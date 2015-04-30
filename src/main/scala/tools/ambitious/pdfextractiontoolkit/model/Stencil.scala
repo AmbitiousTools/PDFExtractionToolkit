@@ -1,13 +1,9 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-/**
- * TODO add documentation
- *
- * @author timothy
- */
-trait Stencil {
+class Stencil {
+  var windows: List[Window] = Nil
 
-  def windows : List[Window]
-  def windows_=(windows: List[Window])
-
+  def addWindow(window: Window) = {
+    windows = windows ++ List(window)
+  }
 }
