@@ -1,11 +1,11 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
 import org.scalatest.FreeSpec
-import tools.ambitious.pdfextractiontoolkit.model.geometry.{Size, Point}
+import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Size}
 
 class WindowSpec extends FreeSpec {
   "A Window instantiated with location equal to (0,10) and size equal to (100, 50)" - {
-    val location: Point = new Point(0, 10)
+    val location: PositivePoint = new PositivePoint(0, 10)
     val size: Size = new Size(100, 50)
 
     val window: Window = new Window(location, size)
