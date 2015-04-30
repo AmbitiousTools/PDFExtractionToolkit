@@ -17,11 +17,8 @@ object Document {
     val pDDocument: PDDocument = PDDocument.load(path)
     val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages
 
-    var document: Document = new Document
-    document.pages = convertPDPageListToPageList(allPDPages)
+    val document: Document = new Document
+    document.pages = Page.listFromPDPageList(allPDPages)
     document
   }
-
-  private def convertPDPageListToPageList(pDPages: util.List[_]): List[Page] =
-    pDPages.map(pDPage => Page.fromPDPage(pDPage.asInstanceOf[PDPage]))(collection.breakOut)
 }
