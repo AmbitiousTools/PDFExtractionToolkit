@@ -1,10 +1,5 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-/**
- * TODO add documentation
- *
- * @author timothy
- */
-trait Window {
+import tools.ambitious.pdfextractiontoolkit.model.geometry._
 
-}
+class Window(val location: Point, val size: Size)
