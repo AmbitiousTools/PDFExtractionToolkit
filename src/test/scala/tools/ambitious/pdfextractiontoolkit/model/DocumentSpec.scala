@@ -1,22 +1,28 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-import org.scalatest.FlatSpec
+import org.scalatest.FreeSpec
 
-class DocumentSpec extends FlatSpec {
+class DocumentSpec extends FreeSpec {
   val samplePDFPath = getClass.getResource("/simplePDFs/SimpleTest1Table.pdf")
+  val twoPagedDocumentPath = getClass.getResource("/simplePDFs/TwoPagedBlankDocument.pdf")
 
-  "Document" should "instantiate from PDF" in {
+  "A Document should instantiate from PDF" in {
     val document = Document.fromPDFPath(samplePDFPath)
   }
 
-  "A Document instantiated with SimpleTest1Table.pdf" should "have one page" in {
+  "A Document instantiated with SimpleTest1Table.pdf" - {
     val document = Document.fromPDFPath(samplePDFPath)
-    assert(document.numberOfPages == 1)
+
+    "should have one page" in {
+      assert(document.numberOfPages == 1)
+    }
   }
 
-  "A Document instantiated with TwoPagedBlankDocument.pdf" should "have two pages" in {
-    val twoPagedDocumentPath = getClass.getResource("/simplePDFs/TwoPagedBlankDocument.pdf")
+  "A Document instantiated with TwoPagedBlankDocument.pdf" - {
     val document = Document.fromPDFPath(twoPagedDocumentPath)
-    assert(document.numberOfPages == 2)
+
+    "should have two pages" in {
+      assert(document.numberOfPages == 2)
+    }
   }
 }
