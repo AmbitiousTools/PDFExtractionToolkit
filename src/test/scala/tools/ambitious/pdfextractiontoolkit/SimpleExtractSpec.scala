@@ -1,8 +1,8 @@
 package tools.ambitious.pdfextractiontoolkit
 
 import org.apache.pdfbox.pdmodel.PDDocument
-import org.nerdpower.tabula.extractors.BasicExtractionAlgorithm
-import org.nerdpower.tabula.{ObjectExtractor, Page}
+import technology.tabula.extractors.BasicExtractionAlgorithm
+import technology.tabula.{ObjectExtractor, Page}
 import org.scalatest._
 
 class SimpleExtractSpec extends FlatSpec {
