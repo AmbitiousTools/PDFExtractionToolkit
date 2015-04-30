@@ -9,7 +9,7 @@ class PageSpec extends FreeSpec {
 
   val twoPagedBlankDocumentPath = getClass.getResource("/simplePDFs/TwoPagedBlankDocument.pdf")
 
-  "In the context of a PDDocument with two pages" - {
+  "In the context of a PDDocument with two pages (from TwoPagedBlankDocument.pdf)" - {
     val pDDocument: PDDocument = PDDocument.load(twoPagedBlankDocumentPath)
     val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages
 
@@ -38,6 +38,34 @@ class PageSpec extends FreeSpec {
         val secondPage: Page = convertedPages(1)
         assert(firstPDPage != secondPage.pDPage)
       }
+    }
+
+    "Print the dimensions of the first page" - {
+      val firstPage: PDPage = allPDPages.get(0).asInstanceOf[PDPage]
+      val mediaBox = firstPage.getMediaBox
+
+      "width" in {
+        println("Width: " + mediaBox.getWidth)
+      }
+
+      "height" in {
+        println("Height: " + mediaBox.getHeight)
+      }
+    }
+  }
+
+  "The first Page of TwoPagedBlankDocument.pdf" - {
+    val pDDocument: PDDocument = PDDocument.load(twoPagedBlankDocumentPath)
+    val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages
+    val firstPDPage: PDPage = allPDPages.get(0).asInstanceOf[PDPage]
+    val firstPage: Page = Page.fromPDPage(firstPDPage)
+
+    "should have width equal to the PDPage's width" in {
+      assert(firstPage.size.width == firstPDPage.getMediaBox.getWidth)
+    }
+
+    "should have height equal to the PDPage's height" in {
+      assert(firstPage.size.height == firstPDPage.getMediaBox.getHeight)
     }
   }
 }
