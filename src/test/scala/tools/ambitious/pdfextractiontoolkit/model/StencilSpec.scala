@@ -22,7 +22,4 @@ class StencilSpec extends FreeSpec {
       assert(stencil.windows.head == window)
     }
   }
-
-
-
 }
