@@ -68,4 +68,15 @@ class PageSpec extends FreeSpec {
       assert(firstPage.size.height == firstPDPage.getMediaBox.getHeight)
     }
   }
+
+  "A Page" - {
+    val pDDocument: PDDocument = PDDocument.load(twoPagedBlankDocumentPath)
+    val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages
+    val firstPDPage: PDPage = allPDPages.get(0).asInstanceOf[PDPage]
+    val page: Page = Page.fromPDPage(firstPDPage)
+
+    "should be able to return a PDDocument with itself as the only page" in {
+      val document: PDDocument = page.asPDDocument
+    }
+  }
 }
