@@ -1,3 +1,0 @@
-package tools.ambitious.pdfextractiontoolkit.model.constraints.types
-
-class AnchorConstraintType extends ConstraintType
