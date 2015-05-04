@@ -9,12 +9,18 @@ class Document {
 
   def numberOfPages: Int = pages.length
 
+  def getPage(number: Int): Page = {
+    if (number <= numberOfPages && number > 0)
+      pages(number-1)
+    else
+      throw new IllegalArgumentException("Invalid page number.")
+  }
 }
 
 object Document {
   def fromPDFPath(path: URL): Document = {
     val pDDocument: PDDocument = PDDocument.load(path)
-    val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages()
+    val allPDPages: util.List[_] = pDDocument.getDocumentCatalog.getAllPages
 
     val document: Document = new Document
     document.pages = Page.listFromPDPageList(allPDPages)

@@ -24,5 +24,21 @@ class DocumentSpec extends FreeSpec {
     "should have two pages" in {
       assert(document.numberOfPages == 2)
     }
+
+    "should be able to get the first page" in {
+      val page: Page = document.getPage(1)
+    }
+
+    "should be able to get the second page" in {
+      val page: Page = document.getPage(2)
+    }
+
+    "should throw an IllegalArgumentException when trying to get the third page" in {
+      val interceptException = intercept[IllegalArgumentException] {
+        val page: Page = document.getPage(3)
+      }
+
+      assert(interceptException.getMessage === "Invalid page number.")
+    }
   }
 }
