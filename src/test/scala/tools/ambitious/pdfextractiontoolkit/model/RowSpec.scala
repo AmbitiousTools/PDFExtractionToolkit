@@ -7,13 +7,12 @@ class RowSpec extends FreeSpec {
   "A row" - {
     var row: Row = new Row
 
-    "should be able to add cells" in {
-      row.addCell(new Cell)
-    }
-
-    "with a cell should be able to get that cell back" in {
+    "with a cell containing the text 'test' added to it" - {
       row.addCell(new Cell("test"))
-      assert(row.getCell(1).text == "test")
+
+      "should have the first cell contain the text 'test" in {
+        assert(row.getCell(1).text == "test")
+      }
     }
   }
 }
