@@ -6,4 +6,8 @@ class Row {
   def addCell(cell: Cell) = {
     cells = cells ++ List(cell)
   }
+
+  def getCell(i: Int) = {
+    cells(i-1)
+  }
 }

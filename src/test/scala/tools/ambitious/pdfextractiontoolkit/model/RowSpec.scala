@@ -10,5 +10,10 @@ class RowSpec extends FreeSpec {
     "should be able to add cells" in {
       row.addCell(new Cell)
     }
+
+    "with a cell should be able to get that cell back" in {
+      row.addCell(new Cell("test"))
+      assert(row.getCell(1).text == "test")
+    }
   }
 }

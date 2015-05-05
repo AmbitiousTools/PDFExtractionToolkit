@@ -6,4 +6,8 @@ class Table {
   def addRow(row: Row) = {
     rows = rows ++ List(row)
   }
+
+  def getCell(i: Int, j: Int): Cell = {
+    rows(j-1).getCell(i)
+  }
 }
