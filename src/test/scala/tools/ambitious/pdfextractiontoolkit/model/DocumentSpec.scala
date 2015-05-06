@@ -1,5 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.scalatest.FreeSpec
 
 class DocumentSpec extends FreeSpec {
@@ -45,6 +46,16 @@ class DocumentSpec extends FreeSpec {
       val table: Table = new Table
       document.addTable(table)
       assert(document.tables.head == table)
+    }
+  }
+
+  "A List of PDDocuments split from TwoPagedBlankDocument.pdf" - {
+    val document: PDDocument = PDDocument.load(twoPagedDocumentPath)
+    val pages: List[PDDocument] = Document.splitPDDocumentIntoPDDocumentForEachPage(document)
+
+    "should have only one page in each PDDocument" in {
+      for (pDDocument: PDDocument <- pages)
+        assert(pDDocument.getDocumentCatalog.getAllPages.size == 1)
     }
   }
 }

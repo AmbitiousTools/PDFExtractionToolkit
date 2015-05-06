@@ -1,35 +1,34 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-import java.util
 import tools.ambitious.pdfextractiontoolkit.model.geometry.Size
-import scala.collection.JavaConversions._
 import org.apache.pdfbox.pdmodel.{PDDocument, PDPage}
 
-class Page() {
-  private var _PDPage: PDPage = new PDPage
+class Page {
+  private var _PDDocument: PDDocument = null
   private var _size: Size = new Size(0,0)
 
-  def pDPage: PDPage = _PDPage
   def size: Size = _size
-
-  def asPDDocument: PDDocument = {
-    var document: PDDocument = new PDDocument
-    document.addPage(this.pDPage)
-    document
-  }
+  def asPDDocument: PDDocument = _PDDocument
+  def getPDPage: PDPage = this.asPDDocument.getDocumentCatalog.getAllPages.get(0).asInstanceOf[PDPage]
 }
 
 object Page {
-  def fromPDPage(pDPage: PDPage): Page = {
-    val page = new Page
-    page._PDPage = pDPage
+  def fromPDDocument(document: PDDocument): Page = {
+    if (numberOfPagesInPDDocument(document) != 1)
+      throw new IllegalArgumentException("Page constructor fromPDDocument must supply a PDDocument with one page only.")
 
-    val mediaBox = pDPage.getMediaBox
+    val page = new Page
+    page._PDDocument = document
+
+    val mediaBox = page.getPDPage.getMediaBox
     page._size = new Size(mediaBox.getWidth, mediaBox.getHeight)
 
     page
   }
 
-  def listFromPDPageList(pDPages: util.List[_]): List[Page] =
-    pDPages.map(pDPage => Page.fromPDPage(pDPage.asInstanceOf[PDPage]))(collection.breakOut)
+  def listFromSinglePagePDDocuments(documents: List[PDDocument]): List[Page] =
+    documents.map(document => Page.fromPDDocument(document))
+
+  private def numberOfPagesInPDDocument(document: PDDocument): Int =
+    document.getDocumentCatalog.getAllPages.size
 }
