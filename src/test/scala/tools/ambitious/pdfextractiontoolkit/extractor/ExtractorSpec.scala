@@ -45,6 +45,7 @@ class ExtractorSpec extends FreeSpec {
 
     "should be able to extract the table and have the value 10 in its top left cell" in {
       extractor.extractTables()
+      document.close()
       val table: Table = document.tables.head
       val cell: Cell = table.getCell(1,1)
 
