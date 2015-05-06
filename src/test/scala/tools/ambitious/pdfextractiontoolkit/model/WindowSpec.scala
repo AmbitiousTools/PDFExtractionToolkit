@@ -40,4 +40,40 @@ class WindowSpec extends FreeSpec {
       window.addConstraint(pageNumberConstraint)
     }
   }
+
+  "A Window instantiated from absolute coordinates 5,10,20,35" - {
+    val window: Window = Window.fromAbsoluteCoordinates(5,10,20,35)
+
+    "should have location.x equal to 5" in {
+      assert(window.location.x == 5)
+    }
+
+    "should have location.y equal to 10" in {
+      assert(window.location.y == 10)
+    }
+
+    "should have size.width equal to 15" in {
+      assert(window.size.width == 15)
+    }
+
+    "should have size.height equal to 25" in {
+      assert(window.size.height == 25)
+    }
+
+    "should have left coordinate equal to 5" in {
+      assert(window.leftCoordinate == 5)
+    }
+
+    "should have top coordinate equal to 10" in {
+      assert(window.topCoordinate == 10)
+    }
+
+    "should have right coordinate equal to 20" in {
+      assert(window.rightCoordinate == 20)
+    }
+
+    "should have bottom coordinate equal to 35" in {
+      assert(window.bottomCoordinate == 35)
+    }
+  }
 }
