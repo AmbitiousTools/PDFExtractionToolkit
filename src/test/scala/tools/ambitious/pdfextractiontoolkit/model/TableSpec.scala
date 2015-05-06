@@ -22,4 +22,24 @@ class TableSpec extends FreeSpec {
       }
     }
   }
+
+  "A table with 2 rows, each containing three entries" - {
+    val table: Table = new Table
+
+    var row: Row = new Row
+    row.addCell("1")
+    row.addCell("2")
+    row.addCell("3")
+    table.addRow(row)
+
+    row = new Row
+    row.addCell("4")
+    row.addCell("5")
+    row.addCell("6")
+    table.addRow(row)
+
+    "should return '1,2,3\n4,5,6' when converted to String" in {
+      assert(table.toString == "1,2,3\n4,5,6")
+    }
+  }
 }
