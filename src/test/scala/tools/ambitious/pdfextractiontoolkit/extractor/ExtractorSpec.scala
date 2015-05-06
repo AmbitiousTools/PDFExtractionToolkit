@@ -19,7 +19,7 @@ class ExtractorSpec extends FreeSpec {
 
     "should be able to apply a stencil" in {
       val stencil: Stencil = new Stencil
-      val window: Window = new Window(new PositivePoint(81, 108), new Size(224, 204))
+      val window: Window = Window.fromAbsoluteCoordinates(108, 81, 312, 305)
       val pageNumberConstraint: PageNumberConstraint = new PageNumberConstraint(1)
       window.addConstraint(pageNumberConstraint)
       stencil.addWindow(window)
@@ -35,7 +35,7 @@ class ExtractorSpec extends FreeSpec {
     extractor.addDocument(document)
 
     val pageNumberConstraint: PageNumberConstraint = new PageNumberConstraint(1)
-    val window: Window = new Window(new PositivePoint(108, 81), new Size(204, 224))
+    val window: Window = Window.fromAbsoluteCoordinates(108, 81, 312, 305)
     window.addConstraint(pageNumberConstraint)
 
     val stencil: Stencil = new Stencil

@@ -45,10 +45,10 @@ class Extractor {
             val objectExtractor = new ObjectExtractor(pageAsPDDocument)
             val wholePage: tabula.Page = objectExtractor.extract(1)
             val tablePageArea = wholePage.getArea(
-              window.location.y.toFloat,
-              window.location.x.toFloat,
-              (window.location.y + window.size.height).toFloat,
-              (window.location.x + window.size.width).toFloat)
+              window.topCoordinate.toFloat,
+              window.leftCoordinate.toFloat,
+              window.bottomCoordinate.toFloat,
+              window.rightCoordinate.toFloat)
 
             val extractionAlgorithm = new BasicExtractionAlgorithm
             val tabulaTable = extractionAlgorithm.extract(tablePageArea).get(0)
