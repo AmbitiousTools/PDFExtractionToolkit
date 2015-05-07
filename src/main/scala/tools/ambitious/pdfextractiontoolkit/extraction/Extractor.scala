@@ -7,21 +7,7 @@ import tools.ambitious.pdfextractiontoolkit.model.constraints.{PageNumberConstra
 import tools.ambitious.pdfextractiontoolkit.model._
 import tools.ambitious.pdfextractiontoolkit.util.TabulaConverter
 
-
-
-class Extractor {
-  private var documents: List[Document] = Nil
-  private var stencil: Stencil = null
-
-  def addDocument(document: Document) =
-    addDocuments(List(document))
-
-  def addDocuments(documents: List[Document]) =
-    this.documents = this.documents ++ documents
-
-  def applyStencil(stencil: Stencil) =
-    this.stencil = stencil
-
+class Extractor private (private val stencil: Stencil, private val documents: List[Document]) {
   def extractTables: Map[Document, Table] =
     documents.map(document => document -> extractStencilFromDocument(document))(collection.breakOut)
 
@@ -72,4 +58,12 @@ class Extractor {
 
     (new BasicExtractionAlgorithm).extract(tablePageArea).get(0)
   }
+}
+
+object Extractor {
+  def fromStencilAndDocuments(stencil: Stencil, documents: List[Document]): Extractor =
+    new Extractor(stencil, documents)
+
+  def fromStencilAndDocument(stencil: Stencil, document: Document): Extractor =
+    fromStencilAndDocuments(stencil, List(document))
 }
