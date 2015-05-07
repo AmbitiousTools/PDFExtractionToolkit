@@ -5,19 +5,19 @@ import tools.ambitious.pdfextractiontoolkit.model.constraints.PageNumberConstrai
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Size}
 
 class WindowSpec extends FreeSpec {
-  "A Window instantiated with location equal to (0,10) and size equal to (100, 50)" - {
-    val location: PositivePoint = new PositivePoint(0, 10)
+  "A Window instantiated with origin equal to (0,10) and size equal to (100, 50)" - {
+    val origin: PositivePoint = new PositivePoint(0, 10)
     val size: Size = new Size(100, 50)
 
-    val window: Window = new Window(location, size)
+    val window: Window = new Window(origin, size)
 
-    "should have location" - {
+    "should have origin" - {
       ".x equal to 0" in {
-        assert(window.location.x == 0)
+        assert(window.origin.x == 0)
       }
 
       ".y equal to 10" in {
-        assert(window.location.y == 10)
+        assert(window.origin.y == 10)
       }
     }
 
@@ -44,12 +44,12 @@ class WindowSpec extends FreeSpec {
   "A Window instantiated from absolute coordinates 5,10,20,35" - {
     val window: Window = Window.fromAbsoluteCoordinates(5,10,20,35)
 
-    "should have location.x equal to 5" in {
-      assert(window.location.x == 5)
+    "should have origin.x equal to 5" in {
+      assert(window.origin.x == 5)
     }
 
-    "should have location.y equal to 10" in {
-      assert(window.location.y == 10)
+    "should have origin.y equal to 10" in {
+      assert(window.origin.y == 10)
     }
 
     "should have size.width equal to 15" in {
