@@ -1,7 +1,12 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
 class Row(private val cells: List[Cell] = Nil) {
-  def getCell(i: Int) = cells(i-1)
+  def getCell(number: Int) = {
+    if (number <= numberOfCells && number > 0)
+      cells(number-1)
+    else
+      throw new IllegalArgumentException("Invalid cell number.")
+  }
 
   def numberOfCells: Int = cells.length
 
