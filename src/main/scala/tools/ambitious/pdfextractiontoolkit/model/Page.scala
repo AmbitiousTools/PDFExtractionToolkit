@@ -9,7 +9,7 @@ class Page {
 
   def size: Size = _size
   def asPDDocument: PDDocument = _PDDocument
-  def getPDPage: PDPage = this.asPDDocument.getDocumentCatalog.getAllPages.get(0).asInstanceOf[PDPage]
+  def asPDPage: PDPage = this.asPDDocument.getDocumentCatalog.getAllPages.get(0).asInstanceOf[PDPage]
 }
 
 object Page {
@@ -20,7 +20,7 @@ object Page {
     val page = new Page
     page._PDDocument = document
 
-    val mediaBox = page.getPDPage.getMediaBox
+    val mediaBox = page.asPDPage.getMediaBox
     page._size = new Size(mediaBox.getWidth, mediaBox.getHeight)
 
     page
