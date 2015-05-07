@@ -38,4 +38,7 @@ object Table {
 
   def fromRow(row: Row): Table =
     fromRows(List(row))
+
+  def merge(tables: List[Table]): Table =
+    fromRows(tables.map(table => table.rows).flatten)
 }
