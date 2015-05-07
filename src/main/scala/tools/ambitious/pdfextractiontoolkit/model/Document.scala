@@ -8,7 +8,7 @@ import org.apache.pdfbox.util.Splitter
 
 import scala.collection.JavaConverters._
 
-class Document private (private val pDDocument: PDDocument, private val pages: List[Page]) {
+class Document private (private val pDDocument: PDDocument, val pages: List[Page]) {
   def numberOfPages: Int = pages.length
 
   def getPage(number: Int): Page = {
