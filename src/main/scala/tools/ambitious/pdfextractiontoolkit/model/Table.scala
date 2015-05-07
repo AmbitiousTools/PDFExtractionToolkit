@@ -13,3 +13,14 @@ class Table {
     rows.map(row => row.toString).mkString("\n")
   }
 }
+
+object Table {
+  def fromRows(rows: List[Row]): Table = {
+    val table: Table = new Table
+    rows.foreach(row => table.addRow(row))
+    table
+  }
+
+  def fromRow(row: Row): Table =
+    fromRows(List(row))
+}

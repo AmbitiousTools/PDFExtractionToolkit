@@ -16,3 +16,20 @@ class Row {
     cells.map(cell => cell.text).mkString(",")
 
 }
+
+object Row {
+  def fromCells(cells: List[Cell]): Row = {
+    val row: Row = new Row
+    cells.foreach(cell => row.addCell(cell))
+    row
+  }
+
+  def fromCell(cell: Cell): Row =
+    fromCells(List(cell))
+
+  def fromStrings(strings: List[String]): Row =
+    fromCells(strings.map(string => new Cell(string)))
+
+  def fromString(string: String): Row =
+    fromStrings(List(string))
+}

@@ -42,4 +42,23 @@ class TableSpec extends FreeSpec {
       assert(table.toString == "1,2,3\n4,5,6")
     }
   }
+
+  "A table instantiated from three rows each containing one cell with text 1, 2 and 3 consecutively" - {
+    val cellContents = List("1", "2", "3")
+    val rows: List[Row] = cellContents.map(i => Row.fromString(i))
+
+    val table: Table = Table.fromRows(rows)
+
+    "should have string '1\n2\n3" in {
+      assert(table.toString == "1\n2\n3")
+    }
+  }
+
+  "A table instantiated from a single row containing a cell with the text 'test'" - {
+    val table: Table = Table.fromRow(Row.fromString("test"))
+
+    "should have string 'test'" in {
+      assert(table.toString == "test")
+    }
+  }
 }
