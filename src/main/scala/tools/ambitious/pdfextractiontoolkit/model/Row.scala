@@ -1,28 +1,35 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-class Row {
-  private var cells: List[Cell] = Nil
+class Row(private val cells: List[Cell] = Nil) {
+  def getCell(i: Int) = cells(i-1)
 
-  def addCell(cell: Cell) =
-    cells = cells ++ List(cell)
+  def numberOfCells: Int = cells.length
 
-  def addCell(cellText: String): Unit =
-    addCell(new Cell(cellText))
-
-  def getCell(i: Int) =
-    cells(i-1)
+  def isEmpty: Boolean = numberOfCells == 0
 
   override def toString: String =
     cells.map(cell => cell.text).mkString(",")
 
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case row: Row =>
+        var cellComparison: Boolean = this.numberOfCells == row.numberOfCells
+        for (i <- 1 to cells.length) {
+          try {
+            cellComparison = cellComparison && (this.getCell(i) == row.getCell(i))
+          } catch {
+            case _: Throwable => cellComparison = false
+          }
+        }
+        cellComparison
+      case _ => false
+    }
+  }
 }
 
 object Row {
-  def fromCells(cells: List[Cell]): Row = {
-    val row: Row = new Row
-    cells.foreach(cell => row.addCell(cell))
-    row
-  }
+  def fromCells(cells: List[Cell]): Row =
+    new Row(cells)
 
   def fromCell(cell: Cell): Row =
     fromCells(List(cell))

@@ -44,9 +44,10 @@ class ExtractorSpec extends FreeSpec {
     extractor.applyStencil(stencil)
 
     "should be able to extract the table and have the value 10 in its top left cell" in {
-      extractor.extractTables()
+      val tableMap: Map[Document, Table] = extractor.extractTables
       document.close()
-      val table: Table = document.tables.head
+
+      val table: Table = tableMap(document)
       val cell: Cell = table.getCell(1,1)
 
       assert(cell.text == "10")

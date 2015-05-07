@@ -1,13 +1,9 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-class Cell(var text: String) {
+class Cell(val text: String = "") {
 
-  def this() = {
-    this("")
-  }
+  def isEmpty: Boolean = text == ""
 
-  def isEmpty: Boolean = text match {
-    case "" => true
-    case _ => false
-  }
+  override def equals(obj: Any): Boolean =
+    obj.isInstanceOf[Cell] && (text == obj.asInstanceOf[Cell].text)
 }

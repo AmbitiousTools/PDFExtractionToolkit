@@ -1,13 +1,13 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
-import org.apache.pdfbox.pdmodel.PDDocument
 import technology.tabula.ObjectExtractor
 import technology.tabula.extractors.BasicExtractionAlgorithm
 import technology.tabula
 import tools.ambitious.pdfextractiontoolkit.model.constraints.{PageNumberConstraint, Constraint}
 import tools.ambitious.pdfextractiontoolkit.model._
+import tools.ambitious.pdfextractiontoolkit.util.TabulaConverter
 
-import scala.collection.JavaConverters._
+
 
 class Extractor {
   private var documents: List[Document] = Nil
@@ -22,54 +22,54 @@ class Extractor {
   def applyStencil(stencil: Stencil) =
     this.stencil = stencil
 
-  def extractTables() = {
-    for (window: Window <- stencil.windows)
-      extractTableFromWindow(window)
-  }
+  def extractTables: Map[Document, Table] =
+    documents.map(document => document -> extractStencilFromDocument(document))(collection.breakOut)
 
-  private def extractTableFromWindow(window: Window) = {
+  private def extractStencilFromDocument(document: Document): Table = {
+    /**
+     * We have a Stencil that contains a bunch of windows and constraints with some
+     * sort of relation between them.
+     *
+     * The flow should be:
+     *  - Use Constraints to find all of the Windows and corresponding Pages in the Document
+     *  - Extract the Table from each Page using Window (in page number order)
+     *  - Merge these Tables together as we're going
+     *  - Return the Table
+     */
+
+    // TODO: Make the following follow the above outlined flow
+
+    var table: Table = new Table
+    val window: Window = stencil.windows.head
+
     for (constraint: Constraint <- window.constraints) {
-
-      /**
-       * The following is not 'clean code' and should be refactored at will.
-       */
-
       constraint match {
         case pageNumberConstraint: PageNumberConstraint =>
-          val pageNumber: Int = pageNumberConstraint.pageNumber
-
-          for (document: Document <- documents) {
-            val page: Page = document.getPage(pageNumber)
-            val pageAsPDDocument: PDDocument = page.asPDDocument
-
-            val objectExtractor = new ObjectExtractor(pageAsPDDocument)
-            val wholePage: tabula.Page = objectExtractor.extract(1)
-            val tablePageArea = wholePage.getArea(
-              window.topCoordinate.toFloat,
-              window.leftCoordinate.toFloat,
-              window.bottomCoordinate.toFloat,
-              window.rightCoordinate.toFloat)
-
-            val extractionAlgorithm = new BasicExtractionAlgorithm
-            val tabulaTable = extractionAlgorithm.extract(tablePageArea).get(0)
-
-            val table: Table = new Table
-
-            for (tabulaRow <- tabulaTable.getRows.asScala) {
-              val row: Row = new Row
-              for (tabulaCell <- tabulaRow.asScala) {
-                val cell: Cell = new Cell(tabulaCell.getText.trim)
-                row.addCell(cell)
-              }
-              table.addRow(row)
-            }
-
-            document.addTable(table)
-          }
+          val page: Page = document.getPage(pageNumberConstraint.pageNumber)
+          table = extractTableFromPageUsingWindow(page, window)
         case _ =>
           throw new Exception("Unknown constraint type!")
       }
     }
 
+    table
+  }
+
+  private def extractTableFromPageUsingWindow(page: Page, window: Window): Table = {
+    val tabulaTable: tabula.Table = extractTabulaTableFromPageUsingWindow(page, window)
+    TabulaConverter.tableFromTabulaTable(tabulaTable)
+  }
+
+  private def extractTabulaTableFromPageUsingWindow(page: Page, window: Window): tabula.Table = {
+    val objectExtractor = new ObjectExtractor(page.asPDDocument)
+    val wholePage: tabula.Page = objectExtractor.extract(1)
+
+    val tablePageArea = wholePage.getArea(
+      window.topCoordinate.toFloat,
+      window.leftCoordinate.toFloat,
+      window.bottomCoordinate.toFloat,
+      window.rightCoordinate.toFloat)
+
+    (new BasicExtractionAlgorithm).extract(tablePageArea).get(0)
   }
 }

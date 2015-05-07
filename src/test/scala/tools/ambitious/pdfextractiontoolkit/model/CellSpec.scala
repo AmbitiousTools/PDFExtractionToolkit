@@ -13,10 +13,6 @@ class CellSpec extends FreeSpec {
     "should return true when asked if empty" in {
       assert(cell.isEmpty)
     }
-
-    "should be able to set the text" in {
-      cell.text = "blah"
-    }
   }
 
   "A cell that is instantiated with the string 'blah'" - {
@@ -28,6 +24,28 @@ class CellSpec extends FreeSpec {
 
     "should return false when asked if empty" in {
       assert(!cell.isEmpty)
+    }
+  }
+
+  "Two cells with the same text" - {
+    val cellA: Cell = new Cell("test")
+    val cellB: Cell = new Cell("test")
+
+    "should be equal" in {
+      assert(cellA == cellB)
+    }
+
+    "should not have the same reference" in {
+      assert(cellA ne cellB)
+    }
+  }
+
+  "Two cells with different text" - {
+    val cellA: Cell = new Cell("test")
+    val cellB: Cell = new Cell("test2")
+
+    "should not be equal" in {
+      assert(cellA != cellB)
     }
   }
 }
