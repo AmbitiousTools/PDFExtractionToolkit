@@ -41,12 +41,6 @@ class DocumentSpec extends FreeSpec {
 
       assert(interceptException.getMessage === "Invalid page number.")
     }
-
-    "should be able to add a table and have it in it's tables property" in {
-      val table: Table = new Table
-      document.addTable(table)
-      assert(document.tables.head == table)
-    }
   }
 
   "A List of PDDocuments split from TwoPagedBlankDocument.pdf" - {

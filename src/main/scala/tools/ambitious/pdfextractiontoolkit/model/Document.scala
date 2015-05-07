@@ -8,11 +8,7 @@ import org.apache.pdfbox.util.Splitter
 
 import scala.collection.JavaConverters._
 
-class Document {
-  private var pages: List[Page] = Nil
-  private var _tables: List[Table] = Nil
-  private var _PDDocument: PDDocument = null
-
+class Document private (private val pDDocument: PDDocument, private val pages: List[Page]) {
   def numberOfPages: Int = pages.length
 
   def getPage(number: Int): Page = {
@@ -22,27 +18,17 @@ class Document {
       throw new IllegalArgumentException("Invalid page number.")
   }
 
-  def addTable(table: Table) = {
-    _tables = _tables ++ List(table)
-  }
-
-  def tables: List[Table] = _tables
-
-  def close() = {
-    _PDDocument.close()
-    _PDDocument = null
-  }
+  def close() = pDDocument.close()
 }
 
 object Document {
   def fromPDFPath(path: URL): Document = {
     val pDDocument: PDDocument = PDDocument.load(path)
-    val splitPDDocuments: List[PDDocument] = Document.splitPDDocumentIntoPDDocumentForEachPage(pDDocument)
 
-    val document: Document = new Document
-    document._PDDocument = pDDocument
-    document.pages = Page.listFromSinglePagePDDocuments(splitPDDocuments)
-    document
+    val splitPDDocuments: List[PDDocument] = Document.splitPDDocumentIntoPDDocumentForEachPage(pDDocument)
+    val pages = Page.listFromSinglePagePDDocuments(splitPDDocuments)
+
+    new Document(pDDocument, pages)
   }
 
   def splitPDDocumentIntoPDDocumentForEachPage(document: PDDocument): List[PDDocument] = {
