@@ -16,5 +16,7 @@ unmanagedBase := baseDirectory.value / "lib_unmanaged"
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
 
-  "tabula-extractor" % "tabula-extractor" % "0.7.4-SNAPSHOT"
+  "tabula-extractor" % "tabula-extractor" % "0.7.4-SNAPSHOT",
+
+  "com.github.tototoshi" %% "scala-csv" % "1.2.1"
 )
