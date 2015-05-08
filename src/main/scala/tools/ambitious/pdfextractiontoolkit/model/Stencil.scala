@@ -1,11 +1,8 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-class Stencil {
-  private var _windows: List[Window] = Nil
+import scala.collection.immutable.ListMap
 
-  def windows: List[Window] = _windows
-
-  def addWindow(window: Window) = {
-    _windows = _windows ++ List(window)
-  }
+class Stencil(private val windowMap: ListMap[Window, ConstraintTracker]) {
+  def windows: List[Window] = windowMap.keysIterator.toList
+  def trackerForWindow(window: Window): ConstraintTracker = windowMap(window)
 }

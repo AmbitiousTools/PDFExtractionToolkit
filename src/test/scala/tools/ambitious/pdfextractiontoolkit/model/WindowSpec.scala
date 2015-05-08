@@ -1,7 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
 import org.scalatest.FreeSpec
-import tools.ambitious.pdfextractiontoolkit.model.constraints.PageNumberConstraint
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Size}
 
 class WindowSpec extends FreeSpec {
@@ -29,15 +28,6 @@ class WindowSpec extends FreeSpec {
       ".height equal to 50" in {
         assert(window.size.height == 50)
       }
-    }
-
-    "should have a constraints property which is an empty List" in {
-      assert(window.constraints.isEmpty)
-    }
-
-    "should be able to add constraints" in {
-      val pageNumberConstraint: PageNumberConstraint = new PageNumberConstraint(1)
-      window.addConstraint(pageNumberConstraint)
     }
   }
 

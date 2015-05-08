@@ -3,7 +3,7 @@ package tools.ambitious.pdfextractiontoolkit.extraction
 import technology.tabula.ObjectExtractor
 import technology.tabula.extractors.BasicExtractionAlgorithm
 import technology.tabula
-import tools.ambitious.pdfextractiontoolkit.model.constraints.{PageNumberConstraint, Constraint}
+import tools.ambitious.pdfextractiontoolkit.model.constraints.{FirstOccurrenceOfStringInWindowConstraint, PageNumberConstraint}
 import tools.ambitious.pdfextractiontoolkit.model._
 import tools.ambitious.pdfextractiontoolkit.util.TabulaConverter
 
@@ -12,29 +12,25 @@ class Extractor private (private val stencil: Stencil, private val documents: Li
     documents.map(document => document -> extractStencilFromDocument(document))(collection.breakOut)
 
   private def extractStencilFromDocument(document: Document): Table = {
-    /**
-     * We have a Stencil that contains a bunch of windows and constraints with some
-     * sort of relation between them.
-     *
-     * The flow should be:
-     *  - Use Constraints to find all of the Windows and corresponding Pages in the Document
-     *  - Extract the Table from each Page using Window (in page number order)
-     *  - Merge these Tables together as we're going
-     *  - Return the Table
-     */
-
-    // TODO: Make the following follow the above outlined flow
-
     var table: Table = new Table
-    val window: Window = stencil.windows.head
 
-    for (constraint: Constraint <- window.constraints) {
-      constraint match {
-        case pageNumberConstraint: PageNumberConstraint =>
-          val page: Page = document.getPage(pageNumberConstraint.pageNumber)
-          table = extractTableFromPageUsingWindow(page, window)
+    for (window: Window <- stencil.windows) {
+      val tracker: ConstraintTracker = stencil.trackerForWindow(window)
+      tracker.anchor match {
+        case constraint: PageNumberConstraint =>
+          val page: Page = document.getPage(constraint.pageNumber)
+          table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
+
+          // TODO: Write tests for the following constraint case before uncommenting
+//        case constraint: FirstOccurrenceOfStringInWindowConstraint =>
+//          val pageMaybe: Option[Page] = document.pages.find(page => extractTableFromPageUsingWindow(page, constraint.window).getCell(1,1).text == constraint.text)
+//          pageMaybe match {
+//            case Some(page) => table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
+//            case None => throw new Exception("Invalid Constraint: Couldn't find text '" + constraint.text + "' in Window " + constraint + " on any page of document " + document + ".")
+//          }
+
         case _ =>
-          throw new Exception("Unknown constraint type!")
+          throw new Exception("Unknown constraint type for constraint tracker anchor.")
       }
     }
 

@@ -3,8 +3,9 @@ package tools.ambitious.pdfextractiontoolkit.extractor
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.extraction.Extractor
 import tools.ambitious.pdfextractiontoolkit.model.constraints.PageNumberConstraint
-import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Size}
 import tools.ambitious.pdfextractiontoolkit.model._
+
+import scala.collection.immutable.ListMap
 
 class ExtractorSpec extends FreeSpec {
   val samplePDFPath = getClass.getResource("/simplePDFs/SimpleTest1Table.pdf")
@@ -12,12 +13,10 @@ class ExtractorSpec extends FreeSpec {
   "An Extractor with a document and valid stencil" - {
     val document: Document = Document.fromPDFPath(samplePDFPath)
 
-    val pageNumberConstraint: PageNumberConstraint = new PageNumberConstraint(1)
     val window: Window = Window.fromAbsoluteCoordinates(108, 81, 312, 305)
-    window.addConstraint(pageNumberConstraint)
+    val tracker: ConstraintTracker = new ConstraintTracker(new PageNumberConstraint(1))
 
-    val stencil: Stencil = new Stencil
-    stencil.addWindow(window)
+    val stencil: Stencil = new Stencil(ListMap(window -> tracker))
 
     val extractor: Extractor = Extractor.fromStencilAndDocument(stencil, document)
 
