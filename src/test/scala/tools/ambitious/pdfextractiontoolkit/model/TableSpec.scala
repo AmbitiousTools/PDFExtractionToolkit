@@ -124,11 +124,65 @@ class TableSpec extends FreeSpec {
     }
   }
 
-  "Two tables that are merged" - {
+  "A list of two tables that are merged" - {
     val tableA: Table = Table.fromRows(List(Row.fromString("a"), Row.fromString("b")))
     val tableB: Table = Table.fromRows(List(Row.fromString("c"), Row.fromString("d")))
 
     val mergedTable: Table = Table.merge(List(tableA, tableB))
+
+    "should have first row equal to the first row in tableA" in {
+      assert(mergedTable.getRow(1) == tableA.getRow(1))
+    }
+
+    "should have second row equal to the second row in tableA" in {
+      assert(mergedTable.getRow(2) == tableA.getRow(2))
+    }
+
+    "should have third row equal to the first row in tableB" in {
+      assert(mergedTable.getRow(3) == tableB.getRow(1))
+    }
+
+    "should have fourth row equal to the second row in tableB" in {
+      assert(mergedTable.getRow(4) == tableB.getRow(2))
+    }
+
+    "should have four rows" in {
+      assert(mergedTable.numberOfRows == 4)
+    }
+  }
+
+  "One table that is merged into another" - {
+    val tableA: Table = Table.fromRows(List(Row.fromString("a"), Row.fromString("b")))
+    val tableB: Table = Table.fromRows(List(Row.fromString("c"), Row.fromString("d")))
+
+    val mergedTable: Table = tableA.mergedWith(tableB)
+
+    "should have first row equal to the first row in tableA" in {
+      assert(mergedTable.getRow(1) == tableA.getRow(1))
+    }
+
+    "should have second row equal to the second row in tableA" in {
+      assert(mergedTable.getRow(2) == tableA.getRow(2))
+    }
+
+    "should have third row equal to the first row in tableB" in {
+      assert(mergedTable.getRow(3) == tableB.getRow(1))
+    }
+
+    "should have fourth row equal to the second row in tableB" in {
+      assert(mergedTable.getRow(4) == tableB.getRow(2))
+    }
+
+    "should have four rows" in {
+      assert(mergedTable.numberOfRows == 4)
+    }
+  }
+
+  "Two tables that are merged" - {
+    val tableA: Table = Table.fromRows(List(Row.fromString("a"), Row.fromString("b")))
+    val tableB: Table = Table.fromRows(List(Row.fromString("c"), Row.fromString("d")))
+
+    val mergedTable: Table = Table.merge(tableA, tableB)
 
     "should have first row equal to the first row in tableA" in {
       assert(mergedTable.getRow(1) == tableA.getRow(1))

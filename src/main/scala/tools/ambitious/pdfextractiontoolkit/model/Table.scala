@@ -30,6 +30,9 @@ class Table(private val rows: List[Row] = Nil) {
       case _ => false
     }
   }
+
+  def mergedWith(table: Table): Table =
+    Table.merge(this, table)
 }
 
 object Table {
@@ -41,4 +44,7 @@ object Table {
 
   def merge(tables: List[Table]): Table =
     fromRows(tables.map(table => table.rows).flatten)
+
+  def merge(tableA: Table, tableB: Table): Table =
+    merge(List(tableA, tableB))
 }
