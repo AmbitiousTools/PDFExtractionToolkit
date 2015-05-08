@@ -21,12 +21,12 @@ class Extractor private (private val stencil: Stencil, private val documents: Li
       tracker.anchor match {
         case constraint: PageNumberConstraint =>
           val page: Page = document.getPage(constraint.pageNumber)
-          table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
+          table = table.mergedWith(extractTableFromPageUsingWindow(page, window))
 
         case constraint: FirstOccurrenceOfStringInWindowConstraint =>
           val pageMaybe: Option[Page] = document.pages.find(page => extractTableFromPageUsingWindow(page, constraint.window).getCell(1,1).text == constraint.text)
           pageMaybe match {
-            case Some(page) => table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
+            case Some(page) => table = table.mergedWith(extractTableFromPageUsingWindow(page, window))
             case None => throw new Exception("Invalid Constraint: Couldn't find text '" + constraint.text + "' in Window " + constraint + " on any page of document " + document + ".")
           }
 
