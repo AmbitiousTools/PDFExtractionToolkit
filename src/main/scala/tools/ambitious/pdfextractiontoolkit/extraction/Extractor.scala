@@ -1,5 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
+import java.util.NoSuchElementException
+
 import technology.tabula.ObjectExtractor
 import technology.tabula.extractors.BasicExtractionAlgorithm
 import technology.tabula
@@ -21,13 +23,12 @@ class Extractor private (private val stencil: Stencil, private val documents: Li
           val page: Page = document.getPage(constraint.pageNumber)
           table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
 
-          // TODO: Write tests for the following constraint case before uncommenting
-//        case constraint: FirstOccurrenceOfStringInWindowConstraint =>
-//          val pageMaybe: Option[Page] = document.pages.find(page => extractTableFromPageUsingWindow(page, constraint.window).getCell(1,1).text == constraint.text)
-//          pageMaybe match {
-//            case Some(page) => table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
-//            case None => throw new Exception("Invalid Constraint: Couldn't find text '" + constraint.text + "' in Window " + constraint + " on any page of document " + document + ".")
-//          }
+        case constraint: FirstOccurrenceOfStringInWindowConstraint =>
+          val pageMaybe: Option[Page] = document.pages.find(page => extractTableFromPageUsingWindow(page, constraint.window).getCell(1,1).text == constraint.text)
+          pageMaybe match {
+            case Some(page) => table = Table.merge(List(table, extractTableFromPageUsingWindow(page, window)))
+            case None => throw new Exception("Invalid Constraint: Couldn't find text '" + constraint.text + "' in Window " + constraint + " on any page of document " + document + ".")
+          }
 
         case _ =>
           throw new Exception("Unknown constraint type for constraint tracker anchor.")
@@ -46,13 +47,17 @@ class Extractor private (private val stencil: Stencil, private val documents: Li
     val objectExtractor = new ObjectExtractor(page.asPDDocument)
     val wholePage: tabula.Page = objectExtractor.extract(1)
 
-    val tablePageArea = wholePage.getArea(
-      window.topCoordinate.toFloat,
-      window.leftCoordinate.toFloat,
-      window.bottomCoordinate.toFloat,
-      window.rightCoordinate.toFloat)
+    try {
+      val tablePageArea = wholePage.getArea(
+        window.topCoordinate.toFloat,
+        window.leftCoordinate.toFloat,
+        window.bottomCoordinate.toFloat,
+        window.rightCoordinate.toFloat)
 
-    (new BasicExtractionAlgorithm).extract(tablePageArea).get(0)
+      (new BasicExtractionAlgorithm).extract(tablePageArea).get(0)
+    } catch {
+      case e: NoSuchElementException => new tabula.Table
+    }
   }
 }
 
