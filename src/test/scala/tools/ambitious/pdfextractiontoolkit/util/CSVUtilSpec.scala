@@ -5,7 +5,7 @@ import tools.ambitious.pdfextractiontoolkit.model.{Row, Table}
 import java.io.File
 
 class CSVUtilSpec extends FreeSpec {
-  val simple3x3DigitsURL = getClass.getResource("/simpleCSVs/Simple3x3Digits.csv")
+  val simple3x3DigitsURL = getClass.getResource("/simpleCSVs/simple3x3Digits.csv")
 
   "A Table from CSV File" - {
     val table: Table = CSVUtil.tableFromFile(new File(simple3x3DigitsURL.toURI))
