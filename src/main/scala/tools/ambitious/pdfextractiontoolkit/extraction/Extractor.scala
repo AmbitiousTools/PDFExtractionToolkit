@@ -15,30 +15,26 @@ class Extractor private (private val stencil: Stencil, private val documents: Li
 
   private def extractStencilFromDocument(document: Document): Table = {
     var table: Table = new Table
+    var pages: List[Page] = Nil
 
     for (window: Window <- stencil.windows) {
       val tracker: ConstraintTracker = stencil.trackerForWindow(window)
-      tracker.anchor match {
-        case constraint: PageNumberConstraint =>
-          val page: Page = document.getPage(constraint.pageNumber)
-          table = table.mergedWith(extractTableFromPageUsingWindow(page, window))
-
-        case constraint: FirstOccurrenceOfStringInWindowConstraint =>
-          val pageMaybe: Option[Page] = document.pages.find(page => extractTableFromPageUsingWindow(page, constraint.window).getCell(1,1).text == constraint.text)
-          pageMaybe match {
-            case Some(page) => table = table.mergedWith(extractTableFromPageUsingWindow(page, window))
-            case None => throw new Exception("Invalid Constraint: Couldn't find text '" + constraint.text + "' in Window " + constraint + " on any page of document " + document + ".")
-          }
-
-        case _ =>
-          throw new Exception("Unknown constraint type for constraint tracker anchor.")
-      }
+      pages = pages ++ List(tracker.anchor.pageFromDocumentAndPreviousPages(document, pages))
+      table = table.mergedWith(Extractor.extractTableFromPageUsingWindow(pages.last, window))
     }
 
     table
   }
+}
 
-  private def extractTableFromPageUsingWindow(page: Page, window: Window): Table = {
+object Extractor {
+  def fromStencilAndDocuments(stencil: Stencil, documents: List[Document]): Extractor =
+    new Extractor(stencil, documents)
+
+  def fromStencilAndDocument(stencil: Stencil, document: Document): Extractor =
+    fromStencilAndDocuments(stencil, List(document))
+
+  def extractTableFromPageUsingWindow(page: Page, window: Window): Table = {
     val tabulaTable: tabula.Table = extractTabulaTableFromPageUsingWindow(page, window)
     TabulaConverter.tableFromTabulaTable(tabulaTable)
   }
@@ -59,12 +55,4 @@ class Extractor private (private val stencil: Stencil, private val documents: Li
       case e: NoSuchElementException => new tabula.Table
     }
   }
-}
-
-object Extractor {
-  def fromStencilAndDocuments(stencil: Stencil, documents: List[Document]): Extractor =
-    new Extractor(stencil, documents)
-
-  def fromStencilAndDocument(stencil: Stencil, document: Document): Extractor =
-    fromStencilAndDocuments(stencil, List(document))
 }
