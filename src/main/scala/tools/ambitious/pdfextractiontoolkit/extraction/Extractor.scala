@@ -1,58 +1,25 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
-import java.util.NoSuchElementException
-
-import technology.tabula.ObjectExtractor
-import technology.tabula.extractors.BasicExtractionAlgorithm
-import technology.tabula
-import tools.ambitious.pdfextractiontoolkit.model.constraints.{FirstOccurrenceOfStringInWindowConstraint, PageNumberConstraint}
 import tools.ambitious.pdfextractiontoolkit.model._
-import tools.ambitious.pdfextractiontoolkit.util.TabulaConverter
 
-class Extractor private (private val stencil: Stencil, private val documents: List[Document]) {
-  def extractTables: Map[Document, Table] =
-    documents.map(document => document -> extractStencilFromDocument(document))(collection.breakOut)
+class Extractor protected(private val document: Document, private val extractors: List[DatumExtractor]) {
 
-  private def extractStencilFromDocument(document: Document): Table = {
-    var table: Table = new Table
-    var pages: List[Page] = Nil
+  def run: List[Table] = {
+    val walker: DocumentWalker = DocumentWalker.toWalk(document)
 
-    for (window: Window <- stencil.windows) {
-      val tracker: ConstraintTracker = stencil.trackerForWindow(window)
-      pages = pages ++ List(tracker.anchor.pageFromDocumentAndPreviousPages(document, pages))
-      table = table.mergedWith(Extractor.extractTableFromPageUsingWindow(pages.last, window))
-    }
+    extractors.foreach(walker.addListener(_))
 
-    table
+    walker.walk()
+
+    val extractedTables: List[Table] = extractors.flatMap(_.extractedTables())
+    extractedTables
   }
 }
 
 object Extractor {
-  def fromStencilAndDocuments(stencil: Stencil, documents: List[Document]): Extractor =
-    new Extractor(stencil, documents)
+  def fromDocumentAndExtractors(document: Document, extractors: List[DatumExtractor]) =
+    new Extractor(document, extractors)
 
-  def fromStencilAndDocument(stencil: Stencil, document: Document): Extractor =
-    fromStencilAndDocuments(stencil, List(document))
-
-  def extractTableFromPageUsingWindow(page: Page, window: Window): Table = {
-    val tabulaTable: tabula.Table = extractTabulaTableFromPageUsingWindow(page, window)
-    TabulaConverter.tableFromTabulaTable(tabulaTable)
-  }
-
-  private def extractTabulaTableFromPageUsingWindow(page: Page, window: Window): tabula.Table = {
-    val objectExtractor = new ObjectExtractor(page.asPDDocument)
-    val wholePage: tabula.Page = objectExtractor.extract(1)
-
-    try {
-      val tablePageArea = wholePage.getArea(
-        window.topCoordinate.toFloat,
-        window.leftCoordinate.toFloat,
-        window.bottomCoordinate.toFloat,
-        window.rightCoordinate.toFloat)
-
-      (new BasicExtractionAlgorithm).extract(tablePageArea).get(0)
-    } catch {
-      case e: NoSuchElementException => new tabula.Table
-    }
-  }
+  def fromDocumentAndExtractors(document: Document, extractors: DatumExtractor*) =
+    new Extractor(document, extractors.toList)
 }

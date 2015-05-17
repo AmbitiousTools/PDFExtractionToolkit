@@ -41,6 +41,18 @@ class DocumentSpec extends FreeSpec {
 
       assert(interceptException.getMessage === "Invalid page number.")
     }
+
+    "should say that its first page is page 1" in {
+      val page1: Page = document.getPage(1)
+      val pageNumOfPage1: Option[Int] = document.pageNumOf(page1)
+      assert(pageNumOfPage1 == Option.apply(1))
+    }
+    
+    "should say that its second page is page 2" in {
+      val page2: Page = document.getPage(2)
+      val pageNumOfPage2: Option[Int] = document.pageNumOf(page2)
+      assert(pageNumOfPage2 == Option.apply(2))
+    }
   }
 
   "A List of PDDocuments split from TwoPagedBlankDocument.pdf" - {
