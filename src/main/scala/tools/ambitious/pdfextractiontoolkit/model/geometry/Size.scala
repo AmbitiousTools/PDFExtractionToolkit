@@ -1,6 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.model.geometry
 
-class Size protected (val width: Double, val height: Double) {
+case class Size protected (width: Double, height: Double) {
   if (width < 0)
     throw new IllegalArgumentException("Width must not be negative")
 
@@ -11,5 +11,5 @@ class Size protected (val width: Double, val height: Double) {
 }
 
 object Size {
-  def widthAndHeight(width:Double, height:Double) = new Size(width, height)
+  def fromWidthAndHeight(width:Double, height:Double) = new Size(width, height)
 }

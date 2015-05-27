@@ -8,7 +8,7 @@ class Page protected (private val document: PDDocument) {
   val asPDPage: PDPage = this.asPDDocument.getDocumentCatalog.getAllPages.get(0).asInstanceOf[PDPage]
 
   private val mediaBox = asPDPage.getMediaBox
-  val size: Size = Size.widthAndHeight(mediaBox.getWidth, mediaBox.getHeight)
+  val size: Size = Size.fromWidthAndHeight(mediaBox.getWidth, mediaBox.getHeight)
 
   def asPDDocument: PDDocument = document
 }
