@@ -19,6 +19,11 @@ class Document private (private val pDDocument: PDDocument, val pages: List[Page
   }
 
   def close() = pDDocument.close()
+
+  def pageNumberOf(page: Page): Option[Int] =
+    Option.apply(pages.indexOf(page))
+      .filter(_ >= 0)
+      .map(_ + 1)
 }
 
 object Document {
