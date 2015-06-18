@@ -5,7 +5,7 @@ class Row(private val cells: List[Cell] = Nil) {
     if (number <= numberOfCells && number > 0)
       cells(number-1)
     else
-      throw new IllegalArgumentException("Invalid cell number.")
+      throw new IllegalArgumentException(s"Invalid cell number $number")
   }
 
   def numberOfCells: Int = cells.length
