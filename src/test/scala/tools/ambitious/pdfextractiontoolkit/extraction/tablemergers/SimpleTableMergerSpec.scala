@@ -1,6 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.extraction.tablemergers
 
 import org.scalatest.FreeSpec
+import tools.ambitious.pdfextractiontoolkit.extraction.{simpleTest2Tables2TitlePage1CSVURL, simpleTest2Tables2TitlePage2CSVURL}
 import tools.ambitious.pdfextractiontoolkit.model.Table
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
 
