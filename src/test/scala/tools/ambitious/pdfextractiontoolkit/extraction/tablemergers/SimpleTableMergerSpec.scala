@@ -18,11 +18,11 @@ class SimpleTableMergerSpec extends FreeSpec {
       "when it merges the two tables" - {
         val merged: Table = simpleTableMerger.mergeTables(tables).get
 
-        assertValue(table = merged, row = 1, column = 3, expected = "4")
-        assertValue(table = merged, row = 6, column = 1, expected = "4")
-        assertValue(table = merged, row = 7, column = 4, expected = "6")
-        assertValue(table = merged, row = 9, column = 2, expected = "9")
-        assertValue(table = merged, row = 20, column = 3, expected = "5")
+        shouldReturnTableWith(table = merged, row = 1, column = 3, expected = "4")
+        shouldReturnTableWith(table = merged, row = 6, column = 1, expected = "4")
+        shouldReturnTableWith(table = merged, row = 7, column = 4, expected = "6")
+        shouldReturnTableWith(table = merged, row = 9, column = 2, expected = "9")
+        shouldReturnTableWith(table = merged, row = 20, column = 3, expected = "5")
       }
     }
 
@@ -32,16 +32,16 @@ class SimpleTableMergerSpec extends FreeSpec {
       "when it merges the two tables" - {
         val merged: Table = simpleTableMerger.mergeTables(tables).get
 
-        assertValue(table = merged, row = 1, column = 3, expected = "5")
-        assertValue(table = merged, row = 6, column = 1, expected = "2")
-        assertValue(table = merged, row = 7, column = 4, expected = "1")
-        assertValue(table = merged, row = 9, column = 2, expected = "8")
-        assertValue(table = merged, row = 20, column = 3, expected = "1")
+        shouldReturnTableWith(table = merged, row = 1, column = 3, expected = "5")
+        shouldReturnTableWith(table = merged, row = 6, column = 1, expected = "2")
+        shouldReturnTableWith(table = merged, row = 7, column = 4, expected = "1")
+        shouldReturnTableWith(table = merged, row = 9, column = 2, expected = "8")
+        shouldReturnTableWith(table = merged, row = 20, column = 3, expected = "1")
       }
     }
   }
 
-  private def assertValue(table: Table, row: Int, column: Int, expected: String):Unit = {
+  private def shouldReturnTableWith(table: Table, row: Int, column: Int, expected: String):Unit = {
     s"should return a table with the value $expected at row $row and column $column" in {
       assert(table.getCell(row, column).text == expected)
     }
