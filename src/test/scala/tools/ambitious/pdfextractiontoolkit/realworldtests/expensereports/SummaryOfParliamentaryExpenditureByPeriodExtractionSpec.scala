@@ -9,7 +9,7 @@ import tools.ambitious.pdfextractiontoolkit.model.geometry.{Size, PositivePoint,
 class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
   "the tony abbott report" - {
-    val abbottTonyReport = getClass.getResource("/expensereports/P34_ABBOTT_Tony.pdf")
+    val abbottTonyReport = getClass.getResource("/expenseReports/P34_ABBOTT_Tony.pdf")
     val document = Document.fromPDFPath(abbottTonyReport)
 
     val textToFind = "Summary of Parliamentary Expenditure by Period"
