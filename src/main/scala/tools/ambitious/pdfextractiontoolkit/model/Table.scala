@@ -1,7 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.model
 
-class Table(private val rows: List[Row] = Nil) {
-  def getCell(i: Int, j: Int): Cell = getRow(j).getCell(i)
+class Table(val rows: List[Row] = Nil) {
+  def getCell(row: Int, column: Int): Cell = getRow(row).getCell(column)
 
   def getRow(number: Int): Row = {
     if (number <= numberOfRows && number > 0)
@@ -43,7 +43,7 @@ object Table {
     fromRows(List(row))
 
   def merge(tables: List[Table]): Table =
-    fromRows(tables.map(table => table.rows).flatten)
+    fromRows(tables.flatMap(table => table.rows))
 
   def merge(tableA: Table, tableB: Table): Table =
     merge(List(tableA, tableB))
