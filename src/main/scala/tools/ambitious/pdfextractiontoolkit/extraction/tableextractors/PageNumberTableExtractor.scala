@@ -1,5 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
 
+import tools.ambitious.pdfextractiontoolkit.extraction.StateBundle
 import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.{SimpleTableMerger, TableMerger}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.Rectangle
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page}
@@ -11,7 +12,7 @@ case class PageNumberTableExtractor protected (pages: Set[Int], region: Rectangl
     throw new IllegalArgumentException("Page numbers can only be positive numbers.")
   }
 
-  override def shouldExtractOnPage(page: Page, document: Document): Boolean =
+  override def shouldExtractOnPage(page: Page, document: Document, stateBundle: StateBundle): Boolean =
     document.pageNumberOf(page).exists(pages.contains)
 
   override val tableMerger: TableMerger = SimpleTableMerger.create

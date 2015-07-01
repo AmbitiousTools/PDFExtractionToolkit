@@ -1,5 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
 
+import tools.ambitious.pdfextractiontoolkit.extraction.StateBundle
 import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.TableMerger
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}
 
@@ -7,13 +8,18 @@ trait MergingSimpleTableExtractor extends SimpleTableExtractor {
 
   val tableMerger: TableMerger
 
-  protected var extractedTables: List[Table] = List()
+  override def onStart(stateBundle: StateBundle): Unit = stateBundle.state = Option.apply(List())
 
-  override def onPage(page: Page, document: Document): Unit = {
-    if (shouldExtractOnPage(page, document)) {
-      extractedTables = extractedTables :+ performExtraction(page, region)
+  override def onPage(page: Page, document: Document, stateBundle: StateBundle): Unit = {
+    if (shouldExtractOnPage(page, document, stateBundle)) {
+
+      val newList: List[Table] = stateBundle.state.asInstanceOf[Option[List[Table]]].get :+ performExtraction(page, region)
+
+      stateBundle.state = Option.apply(newList)
     }
   }
 
-  override def getTable: Option[Table] = tableMerger.mergeTables(extractedTables)
+  override def tableFromState(stateBundle: StateBundle): Option[Table] = {
+    tableMerger.mergeTables(stateBundle.state.asInstanceOf[Option[List[Table]]].get)
+  }
 }
