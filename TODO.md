@@ -4,3 +4,4 @@
 3. Pull out decision of when to extract as distinct from performing the extraction
 4. Add a numberOfColumns method to the Table class
 5. Review mutability of the DocumentWalker
+6. Add threading
