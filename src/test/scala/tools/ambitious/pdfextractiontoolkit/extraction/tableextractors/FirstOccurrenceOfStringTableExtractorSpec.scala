@@ -2,8 +2,8 @@ package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
 
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.extraction._
-import tools.ambitious.pdfextractiontoolkit.model.{Table, Document}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
+import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
 
 class FirstOccurrenceOfStringTableExtractorSpec extends FreeSpec {
@@ -17,12 +17,11 @@ class FirstOccurrenceOfStringTableExtractorSpec extends FreeSpec {
 
     "when put through a walker with test document SimpleTest2Tables1Title.pdf" - {
       val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
-      val walker: DocumentWalker = DocumentWalker.toWalk(document)
-      walker.addListener(tableExtractor)
+      val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
       walker.walk()
 
       "should return the table at page 2" in {
-        val table: Table = tableExtractor.getTable.get
+        val table: Table = walker.getTables(tableExtractor).get
         val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
         assert(table == tableFromCSV)

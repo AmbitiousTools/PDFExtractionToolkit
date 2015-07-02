@@ -16,12 +16,11 @@ class PageNumberTableExtractorSpec extends FreeSpec {
 
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
-        val walker: DocumentWalker = DocumentWalker.toWalk(document)
-        walker.addListener(tableExtractor)
+        val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
         walker.walk()
 
         "should return the table at page 2" in {
-          val table: Table = tableExtractor.getTable.get
+          val table: Table = walker.getTables(tableExtractor).get
           val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
           assert(table == tableFromCSV)
@@ -35,12 +34,11 @@ class PageNumberTableExtractorSpec extends FreeSpec {
 
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
-        val walker: DocumentWalker = DocumentWalker.toWalk(document)
-        walker.addListener(tableExtractor)
+        val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
         walker.walk()
 
         "should return the two tables merged" in {
-          val table: Table = tableExtractor.getTable.get
+          val table: Table = walker.getTables(tableExtractor).get
 
           val tableMerger: SimpleTableMerger = SimpleTableMerger.create
 

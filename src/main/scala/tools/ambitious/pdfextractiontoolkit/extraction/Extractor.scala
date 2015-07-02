@@ -6,13 +6,11 @@ import tools.ambitious.pdfextractiontoolkit.model._
 class Extractor protected(private val document: Document, private val extractors: List[TableExtractor]) {
 
   def extractTables: List[Table] = {
-    val walker: DocumentWalker = DocumentWalker.toWalk(document)
-
-    extractors.foreach(walker.addListener(_))
+    val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractors(document, extractors)
 
     walker.walk()
 
-    extractors.flatMap(_.getTable.orElse(None))
+    walker.getTables.values.flatten.toList
   }
 }
 
