@@ -7,27 +7,28 @@ class DocumentWalker protected (val document:Document, val tableExtractors: Set[
   val stateBundles: Map[TableExtractor, StateBundle] = tableExtractors.map(_ -> StateBundle.create).toMap
 
   def walk() = {
-    callOnStartOnTableExtractors(stateBundles)
+    callOnStartOnTableExtractors()
 
-    eachPageOnTableExtractors(stateBundles)
+    document.pages.foreach(page => callOnPageOnTableExtractors(page))
 
-    callOnEndOnTableExtractors(stateBundles)
+    callOnEndOnTableExtractors()
   }
 
-  def getTables: Map[TableExtractor, Option[Table]] = tableExtractors
-    .map(tableExtractor => tableExtractor -> tableExtractor.tableFromState(stateBundles(tableExtractor)))
-    .toMap
+  def getTables: Map[TableExtractor, Table] = {
+    tableExtractors
+      .map(tableExtractor => tableExtractor -> tableExtractor.tableFromState(stateBundles(tableExtractor)))
+      .filter((tuple: (TableExtractor, Option[Table])) => tuple._2.isDefined)
+      .map((tuple: (TableExtractor, Option[Table])) => tuple._1 -> tuple._2.get)
+      .toMap
+  }
 
-  private def callOnStartOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle]) =
+  private def callOnStartOnTableExtractors() =
     tableExtractors.foreach(tableExtractor => tableExtractor.onStart(stateBundles(tableExtractor)))
 
-  private def eachPageOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle]) =
-    document.pages.foreach(callOnPageOnTableExtractors(stateBundles, _))
-
-  private def callOnPageOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle], page: Page) =
+  private def callOnPageOnTableExtractors(page: Page) =
     tableExtractors.foreach(tableExtractor => tableExtractor.onPage(page, document, stateBundles(tableExtractor)))
 
-  private def callOnEndOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle]) =
+  private def callOnEndOnTableExtractors() =
     tableExtractors.foreach(tableExtractor => tableExtractor.onEnd(stateBundles(tableExtractor)))
 }
 

@@ -10,7 +10,7 @@ class Extractor protected(private val document: Document, private val extractors
 
     walker.walk()
 
-    walker.getTables.values.flatten.toList
+    walker.getTables.values.toList
   }
 }
 

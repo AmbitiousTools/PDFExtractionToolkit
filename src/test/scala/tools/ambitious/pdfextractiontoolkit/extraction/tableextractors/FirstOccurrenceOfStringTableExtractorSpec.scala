@@ -21,10 +21,10 @@ class FirstOccurrenceOfStringTableExtractorSpec extends FreeSpec {
       walker.walk()
 
       "should return the table at page 2" in {
-        val table: Table = walker.getTables(tableExtractor).get
+        val table: Option[Table] = walker.getTables.get(tableExtractor)
         val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
-        assert(table == tableFromCSV)
+        assert(table.get == tableFromCSV)
       }
     }
   }
