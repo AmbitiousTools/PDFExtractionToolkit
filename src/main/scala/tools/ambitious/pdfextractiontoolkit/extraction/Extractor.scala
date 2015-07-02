@@ -2,15 +2,19 @@ package tools.ambitious.pdfextractiontoolkit.extraction
 
 import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.TableExtractor
 import tools.ambitious.pdfextractiontoolkit.model._
+import scala.concurrent.{Promise, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class Extractor protected(private val document: Document, private val extractors: List[TableExtractor]) {
 
-  def extractTables: List[Table] = {
+  def extractTables: Future[List[Table]] = {
     val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractors(document, extractors)
 
-    walker.walk()
-
-    walker.getTables.values.toList
+    val promise: Promise[List[Table]] = Promise()
+    walker.getTables.onSuccess {
+      case tables => promise.success(tables.values.toList)
+    }
+    promise.future
   }
 }
 

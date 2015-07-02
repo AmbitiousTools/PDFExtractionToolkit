@@ -5,6 +5,8 @@ import tools.ambitious.pdfextractiontoolkit.extraction._
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 class FirstOccurrenceOfStringTableExtractorSpec extends FreeSpec {
   val simpleTest2Tables2TitleURL = getClass.getResource("/simplePDFs/SimpleTest2Tables1Title.pdf")
@@ -18,10 +20,10 @@ class FirstOccurrenceOfStringTableExtractorSpec extends FreeSpec {
     "when put through a walker with test document SimpleTest2Tables1Title.pdf" - {
       val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
       val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
-      walker.walk()
+      val tables: Map[TableExtractor, Table] = Await.result(walker.getTables, 60.seconds)
 
       "should return the table at page 2" in {
-        val table: Option[Table] = walker.getTables.get(tableExtractor)
+        val table: Option[Table] = tables.get(tableExtractor)
         val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
         assert(table.get == tableFromCSV)

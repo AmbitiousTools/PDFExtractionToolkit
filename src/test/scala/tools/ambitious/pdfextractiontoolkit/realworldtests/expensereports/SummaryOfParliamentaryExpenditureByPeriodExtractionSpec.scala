@@ -5,6 +5,8 @@ import tools.ambitious.pdfextractiontoolkit.extraction.Extractor
 import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.FirstOccurrenceOfStringTableExtractor
 import tools.ambitious.pdfextractiontoolkit.model.{Table, Document}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{Size, PositivePoint, Rectangle}
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
@@ -20,7 +22,7 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
       val extractor = Extractor.fromDocumentAndExtractors(document, tableExtractor)
 
-      val tables: List[Table] = extractor.extractTables
+      val tables: List[Table] = Await.result(extractor.extractTables, 60.seconds)
 
       "should return a single table" in {
         assert(tables.length == 1)
