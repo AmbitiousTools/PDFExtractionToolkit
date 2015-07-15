@@ -1,10 +1,10 @@
-package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
+package tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints
 
 import tools.ambitious.pdfextractiontoolkit.extraction.StateBundle
 import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.TableMerger
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}
 
-trait MergingSimpleTableExtractor extends SimpleTableExtractor {
+trait MergingSimpleExtractionConstraint extends SimpleExtractionConstraint {
 
   val tableMerger: TableMerger
 
@@ -13,13 +13,13 @@ trait MergingSimpleTableExtractor extends SimpleTableExtractor {
   override def onPage(page: Page, document: Document, stateBundle: StateBundle): Unit = {
     if (shouldExtractOnPage(page, document, stateBundle)) {
 
-      val newList: List[Table] = stateBundle.state.asInstanceOf[Option[List[Table]]].get :+ performExtraction(page, region)
+      val newList: List[Table] = stateBundle.state.asInstanceOf[Option[List[Table]]].get :+ performExtraction(page)
 
       stateBundle.state = Option.apply(newList)
     }
   }
 
-  override def tableFromState(stateBundle: StateBundle): Option[Table] = {
+  override def tableFromState(stateBundle: StateBundle): Option[Table] =
     tableMerger.mergeTables(stateBundle.state.asInstanceOf[Option[List[Table]]].get)
-  }
+
 }

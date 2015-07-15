@@ -2,9 +2,11 @@ package tools.ambitious.pdfextractiontoolkit.realworldtests.expensereports
 
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.extraction.Extractor
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{TableExtractor, FirstOccurrenceOfStringTableExtractor}
-import tools.ambitious.pdfextractiontoolkit.model.{Table, Document}
-import tools.ambitious.pdfextractiontoolkit.model.geometry.{Size, PositivePoint, Rectangle}
+import tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints.{ExtractionConstraint, FirstOccurrenceOfStringExtractionConstraint}
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.RegionBasedTableExtractor
+import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
+import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -19,20 +21,23 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
     val textToFind = "Summary of Parliamentary Expenditure by Period"
     s"when provided to an extractor with the following regions looking for '$textToFind'" - {
-      val textRegion = Rectangle.fromCornerAndSize(PositivePoint.at(165, 90), Size.fromWidthAndHeight(280, 25))
       val tableRegion = Rectangle.fromCornerAndSize(PositivePoint.at(34, 138), Size.fromWidthAndHeight(540, 608))
-      val tableExtractor = FirstOccurrenceOfStringTableExtractor.withTextAndRegion(textToFind, textRegion, tableRegion)
+      val tableExtractor = RegionBasedTableExtractor.forRegion(tableRegion)
 
-      val extractor = Extractor.fromDocumentsAndExtractors(List(abbottTonyDocument, leighAndrewDocument), tableExtractor)
+      val textRegion = Rectangle.fromCornerAndSize(PositivePoint.at(165, 90), Size.fromWidthAndHeight(280, 25))
 
-      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
+      val extractionConstraint = FirstOccurrenceOfStringExtractionConstraint.withTextAndTableExtractor(textToFind, textRegion, tableExtractor)
+
+      val extractor = Extractor.fromDocumentsAndConstraints(List(abbottTonyDocument, leighAndrewDocument), extractionConstraint)
+
+      val tables: Map[Document, Map[ExtractionConstraint, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
       "the tony abbott document" - {
         "should return a single table" in {
-          assert(tables(abbottTonyDocument).get(tableExtractor).isDefined)
+          assert(tables(abbottTonyDocument).get(extractionConstraint).isDefined)
         }
 
-        val table: Table = tables(abbottTonyDocument)(tableExtractor)
+        val table: Table = tables(abbottTonyDocument)(extractionConstraint)
 
         val expectedRows = 24
         s"should have $expectedRows rows in the returned table" in {
@@ -45,10 +50,10 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
       "the andrew leigh document" - {
         "should return a single table" in {
-          assert(tables(leighAndrewDocument).get(tableExtractor).isDefined)
+          assert(tables(leighAndrewDocument).get(extractionConstraint).isDefined)
         }
 
-        val table: Table = tables(leighAndrewDocument)(tableExtractor)
+        val table: Table = tables(leighAndrewDocument)(extractionConstraint)
 
         val expectedRows = 26
         s"should have $expectedRows rows in the returned table" in {
