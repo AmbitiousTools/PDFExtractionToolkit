@@ -2,7 +2,7 @@ package tools.ambitious.pdfextractiontoolkit.realworldtests.expensereports
 
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.extraction.Extractor
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.FirstOccurrenceOfStringTableExtractor
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{TableExtractor, FirstOccurrenceOfStringTableExtractor}
 import tools.ambitious.pdfextractiontoolkit.model.{Table, Document}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{Size, PositivePoint, Rectangle}
 import scala.concurrent.Await
@@ -10,9 +10,12 @@ import scala.concurrent.duration._
 
 class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
-  "the tony abbott report" - {
+  "the tony abbott and andrew leigh reports" - {
     val abbottTonyReport = getClass.getResource("/expenseReports/P34_ABBOTT_Tony.pdf")
-    val document = Document.fromPDFPath(abbottTonyReport)
+    val abbottTonyDocument = Document.fromPDFPath(abbottTonyReport)
+
+    val leighAndrewReport = getClass.getResource("/expenseReports/P34_LEIGH_Andrew.pdf")
+    val leighAndrewDocument = Document.fromPDFPath(leighAndrewReport)
 
     val textToFind = "Summary of Parliamentary Expenditure by Period"
     s"when provided to an extractor with the following regions looking for '$textToFind'" - {
@@ -20,23 +23,41 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
       val tableRegion = Rectangle.fromCornerAndSize(PositivePoint.at(34, 138), Size.fromWidthAndHeight(540, 608))
       val tableExtractor = FirstOccurrenceOfStringTableExtractor.withTextAndRegion(textToFind, textRegion, tableRegion)
 
-      val extractor = Extractor.fromDocumentAndExtractors(document, tableExtractor)
+      val extractor = Extractor.fromDocumentsAndExtractors(List(abbottTonyDocument, leighAndrewDocument), tableExtractor)
 
-      val tables: List[Table] = Await.result(extractor.extractTables, 60.seconds)
+      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
-      "should return a single table" in {
-        assert(tables.length == 1)
+      "the tony abbott document" - {
+        "should return a single table" in {
+          assert(tables(abbottTonyDocument).get(tableExtractor).isDefined)
+        }
+
+        val table: Table = tables(abbottTonyDocument)(tableExtractor)
+
+        val expectedRows = 24
+        s"should have $expectedRows rows in the returned table" in {
+          assert(table.numberOfRows == expectedRows)
+        }
+
+        shouldHaveTextInTableAtRowAndColumn(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
+        shouldHaveTextInTableAtRowAndColumn(expectedText = "$628,736.33", table = table, rowNumber = 23, columnNumber = 2)
       }
 
-      val table: Table = tables.head
+      "the andrew leigh document" - {
+        "should return a single table" in {
+          assert(tables(leighAndrewDocument).get(tableExtractor).isDefined)
+        }
 
-      val expectedRows = 24
-      s"should have $expectedRows rows in the returned table" in {
-        assert(table.numberOfRows == expectedRows)
+        val table: Table = tables(leighAndrewDocument)(tableExtractor)
+
+        val expectedRows = 26
+        s"should have $expectedRows rows in the returned table" in {
+          assert(table.numberOfRows == expectedRows)
+        }
+
+        shouldHaveTextInTableAtRowAndColumn(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
+        shouldHaveTextInTableAtRowAndColumn(expectedText = "$109,760.32", table = table, rowNumber = 26, columnNumber = 2)
       }
-
-      shouldHaveTextInTableAtRowAndColumn(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
-      shouldHaveTextInTableAtRowAndColumn(expectedText = "$628,736.33", table = table, rowNumber = 23, columnNumber = 2)
     }
   }
 
