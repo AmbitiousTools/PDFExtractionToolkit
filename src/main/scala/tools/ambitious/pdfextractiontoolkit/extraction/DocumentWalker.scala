@@ -1,39 +1,54 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
+import scala.concurrent.{Promise, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.TableExtractor
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}
 
 class DocumentWalker protected (val document:Document, val tableExtractors: Set[TableExtractor]) {
-  val stateBundles: Map[TableExtractor, StateBundle] = tableExtractors.map(_ -> StateBundle.create).toMap
+  private val stateBundles: Map[TableExtractor, StateBundle] = tableExtractors.map(_ -> StateBundle.create).toMap
+  private val promise: Promise[Map[TableExtractor, Table]] = Promise()
 
-  def walk() = {
-    callOnStartOnTableExtractors(stateBundles)
+  private def run() =
+    Future {
+      traverseDocument()
+      promise.success(getCompletedTables)
+    }
 
-    eachPageOnTableExtractors(stateBundles)
+  private def traverseDocument() = {
+      callOnStartOnTableExtractors()
 
-    callOnEndOnTableExtractors(stateBundles)
+      document.pages.foreach(page => callOnPageOnTableExtractors(page))
+
+      callOnEndOnTableExtractors()
   }
 
-  def getTables: Map[TableExtractor, Option[Table]] = tableExtractors
-    .map(tableExtractor => tableExtractor -> tableExtractor.tableFromState(stateBundles(tableExtractor)))
-    .toMap
+  private def getCompletedTables: Map[TableExtractor, Table] =
+    tableExtractors
+      .map(tableExtractor => tableExtractor -> tableExtractor.tableFromState(stateBundles(tableExtractor)))
+      .filter((tuple: (TableExtractor, Option[Table])) => tuple._2.isDefined)
+      .map((tuple: (TableExtractor, Option[Table])) => tuple._1 -> tuple._2.get)
+      .toMap
 
-  private def callOnStartOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle]) =
+  def getTables: Future[Map[TableExtractor, Table]] =
+    promise.future
+
+  private def callOnStartOnTableExtractors() =
     tableExtractors.foreach(tableExtractor => tableExtractor.onStart(stateBundles(tableExtractor)))
 
-  private def eachPageOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle]) =
-    document.pages.foreach(callOnPageOnTableExtractors(stateBundles, _))
-
-  private def callOnPageOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle], page: Page) =
+  private def callOnPageOnTableExtractors(page: Page) =
     tableExtractors.foreach(tableExtractor => tableExtractor.onPage(page, document, stateBundles(tableExtractor)))
 
-  private def callOnEndOnTableExtractors(stateBundles: Map[TableExtractor, StateBundle]) =
+  private def callOnEndOnTableExtractors() =
     tableExtractors.foreach(tableExtractor => tableExtractor.onEnd(stateBundles(tableExtractor)))
 }
 
 object DocumentWalker {
-  def toWalkWithTableExtractors(document: Document, tableExtractors: Set[TableExtractor]): DocumentWalker =
-    new DocumentWalker(document, tableExtractors)
+  def toWalkWithTableExtractors(document: Document, tableExtractors: Set[TableExtractor]): DocumentWalker = {
+    val walker = new DocumentWalker(document, tableExtractors)
+    walker.run()
+    walker
+  }
 
   def toWalkWithTableExtractors(document: Document, tableExtractors: Seq[TableExtractor]): DocumentWalker =
     toWalkWithTableExtractors(document, tableExtractors.toSet)

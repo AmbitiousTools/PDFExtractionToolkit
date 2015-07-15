@@ -6,6 +6,8 @@ import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.SimpleTableM
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 class PageNumberTableExtractorSpec extends FreeSpec {
   val region: Rectangle = Rectangle.fromCornerAndSize(PositivePoint.at(168.48, 240), Size.fromWidthAndHeight(213.54, 340))
@@ -17,13 +19,13 @@ class PageNumberTableExtractorSpec extends FreeSpec {
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
         val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
-        walker.walk()
+        val tables: Map[TableExtractor, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the table at page 2" in {
-          val table: Table = walker.getTables(tableExtractor).get
+          val table: Option[Table] = tables.get(tableExtractor)
           val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
-          assert(table == tableFromCSV)
+          assert(table.get == tableFromCSV)
         }
       }
     }
@@ -35,20 +37,20 @@ class PageNumberTableExtractorSpec extends FreeSpec {
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
         val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
-        walker.walk()
+        val tables: Map[TableExtractor, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the two tables merged" in {
-          val table: Table = walker.getTables(tableExtractor).get
+          val table: Option[Table] = tables.get(tableExtractor)
 
           val tableMerger: SimpleTableMerger = SimpleTableMerger.create
 
           val table1: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage1CSVURL)
           val table2: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
-          val tables: List[Table] = List(table1, table2)
+          val tablesToMerge: List[Table] = List(table1, table2)
 
-          val tableFromCSV: Table = tableMerger.mergeTables(tables).get
+          val tableFromCSV: Table = tableMerger.mergeTables(tablesToMerge).get
 
-          assert(table == tableFromCSV)
+          assert(table.get == tableFromCSV)
         }
       }
     }
