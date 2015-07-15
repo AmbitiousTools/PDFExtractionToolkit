@@ -1,7 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
 import org.scalatest.FreeSpec
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{FirstOccurrenceOfStringTableExtractor, PageNumberTableExtractor}
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{TableExtractor, FirstOccurrenceOfStringTableExtractor, PageNumberTableExtractor}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
@@ -18,11 +18,11 @@ class ExtractorSpec extends FreeSpec {
     val extractor: Extractor = Extractor.fromDocumentAndExtractors(document, tableExtractor)
 
     "should be able to extract the table and have it match the values from it's corresponding CSV file" in {
-      val tables: List[Table] = Await.result(extractor.extractTables, 60.seconds)
+      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
       document.close()
 
-      val table: Table = tables.head
+      val table: Table = tables(document)(tableExtractor)
       val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest1TableCSVURL)
 
       assert(table == tableFromCSV)
@@ -39,11 +39,11 @@ class ExtractorSpec extends FreeSpec {
     val extractor: Extractor = Extractor.fromDocumentAndExtractors(document, tableExtractor)
 
     "should be able to extract the table and have it match the values from it's corresponding CSV file" in {
-      val tables: List[Table] = Await.result(extractor.extractTables, 60.seconds)
+      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
       document.close()
 
-      val table: Table = tables.head
+      val table: Table = tables(document)(tableExtractor)
       val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
       assert(table == tableFromCSV)
