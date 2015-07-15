@@ -1,4 +1,4 @@
-package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
+package tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints
 
 import tools.ambitious.pdfextractiontoolkit.extraction.StateBundle
 import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.TableMerger
@@ -19,7 +19,7 @@ trait MergingSimpleExtractionConstraint extends SimpleExtractionConstraint {
     }
   }
 
-  override def tableFromState(stateBundle: StateBundle): Option[Table] = {
+  override def tableFromState(stateBundle: StateBundle): Option[Table] =
     tableMerger.mergeTables(stateBundle.state.asInstanceOf[Option[List[Table]]].get)
-  }
+
 }

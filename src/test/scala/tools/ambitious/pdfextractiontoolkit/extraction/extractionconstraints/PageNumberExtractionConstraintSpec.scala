@@ -1,7 +1,8 @@
-package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
+package tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints
 
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.extraction._
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.RegionBasedTableExtractor
 import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.SimpleTableMerger
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
@@ -10,21 +11,21 @@ import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class PageNumberTableExtractorSpec extends FreeSpec {
+class PageNumberExtractionConstraintSpec extends FreeSpec {
   val region: Rectangle = Rectangle.fromCornerAndSize(PositivePoint.at(168.48, 240), Size.fromWidthAndHeight(213.54, 340))
-  val pageToTableTranslator = RegionBasedPageToTableTranslator.forRegion(region)
+  val tableExtractor = RegionBasedTableExtractor.forRegion(region)
 
   s"A ${PageNumberExtractionConstraint.getClass.getSimpleName}" - {
     "for page 2" - {
-      val tableExtractor: PageNumberExtractionConstraint = PageNumberExtractionConstraint.withPageNumberAndTranslator(2, pageToTableTranslator)
+      val extractionConstraint: PageNumberExtractionConstraint = PageNumberExtractionConstraint.withPageNumberAndTableExtractor(2, tableExtractor)
 
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
-        val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
+        val walker: DocumentWalker = DocumentWalker.toWalkWithExtractionConstraint(document, extractionConstraint)
         val tables: Map[ExtractionConstraint, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the table at page 2" in {
-          val table: Option[Table] = tables.get(tableExtractor)
+          val table: Option[Table] = tables.get(extractionConstraint)
           val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
 
           assert(table.get == tableFromCSV)
@@ -33,16 +34,16 @@ class PageNumberTableExtractorSpec extends FreeSpec {
     }
 
     "for a page range from 1 to 2" - {
-      val tableExtractor: PageNumberExtractionConstraint =
-        PageNumberExtractionConstraint.withPageRangeAndTranslator(Range.inclusive(1, 2), pageToTableTranslator)
+      val extractionConstraint: PageNumberExtractionConstraint =
+        PageNumberExtractionConstraint.withPageRangeAndTableExtractor(Range.inclusive(1, 2), tableExtractor)
 
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
-        val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
+        val walker: DocumentWalker = DocumentWalker.toWalkWithExtractionConstraint(document, extractionConstraint)
         val tables: Map[ExtractionConstraint, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the two tables merged" in {
-          val table: Option[Table] = tables.get(tableExtractor)
+          val table: Option[Table] = tables.get(extractionConstraint)
 
           val tableMerger: SimpleTableMerger = SimpleTableMerger.create
 
@@ -60,9 +61,9 @@ class PageNumberTableExtractorSpec extends FreeSpec {
     s"instantiated for a page number less than 1 should throw an IllegalArgumentException" - {
       val instantiatePageNumberTableExtractor = intercept[IllegalArgumentException] {
 
-        val dummyTranslator = RegionBasedPageToTableTranslator.forRegion(Rectangle.fromCornerCoords(0, 0, 0, 0))
+        val dummyExtractor = RegionBasedTableExtractor.forRegion(Rectangle.fromCornerCoords(0, 0, 0, 0))
 
-        PageNumberExtractionConstraint.withPageNumberAndTranslator(0, dummyTranslator)
+        PageNumberExtractionConstraint.withPageNumberAndTableExtractor(0, dummyExtractor)
       }
       assert(instantiatePageNumberTableExtractor.getMessage === "Page numbers can only be positive numbers.")
     }

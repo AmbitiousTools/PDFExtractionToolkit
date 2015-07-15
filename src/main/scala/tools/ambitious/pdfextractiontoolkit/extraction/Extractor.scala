@@ -1,6 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.ExtractionConstraint
+import tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints.ExtractionConstraint
 import tools.ambitious.pdfextractiontoolkit.model._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -9,7 +9,7 @@ import scala.concurrent.{Future, Promise}
 class Extractor protected(private val documents: List[Document], private val extractors: List[ExtractionConstraint]) {
 
   private def extractTablesFromDocument(document: Document): Future[Map[ExtractionConstraint, Table]] = {
-    val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractors(document, extractors)
+    val walker: DocumentWalker = DocumentWalker.toWalkWithExtractionConstraint(document, extractors)
 
     val promise: Promise[Map[ExtractionConstraint, Table]] = Promise()
     walker.getTables.onSuccess {
@@ -27,15 +27,15 @@ class Extractor protected(private val documents: List[Document], private val ext
 }
 
 object Extractor {
-  def fromDocumentsAndExtractors(documents: List[Document], extractors: List[ExtractionConstraint]): Extractor =
+  def fromDocumentsAndConstraints(documents: List[Document], extractors: List[ExtractionConstraint]): Extractor =
     new Extractor(documents, extractors)
 
-  def fromDocumentsAndExtractors(documents: List[Document], extractors: ExtractionConstraint*): Extractor =
-    fromDocumentsAndExtractors(documents, extractors.toList)
+  def fromDocumentsAndConstraints(documents: List[Document], extractors: ExtractionConstraint*): Extractor =
+    fromDocumentsAndConstraints(documents, extractors.toList)
 
-  def fromDocumentAndExtractors(document: Document, extractors: List[ExtractionConstraint]): Extractor =
-    fromDocumentsAndExtractors(List(document), extractors)
+  def fromDocumentAndConstraints(document: Document, extractors: List[ExtractionConstraint]): Extractor =
+    fromDocumentsAndConstraints(List(document), extractors)
 
-  def fromDocumentAndExtractors(document: Document, extractors: ExtractionConstraint*): Extractor =
-    fromDocumentAndExtractors(document, extractors.toList)
+  def fromDocumentAndConstraints(document: Document, extractors: ExtractionConstraint*): Extractor =
+    fromDocumentAndConstraints(document, extractors.toList)
 }

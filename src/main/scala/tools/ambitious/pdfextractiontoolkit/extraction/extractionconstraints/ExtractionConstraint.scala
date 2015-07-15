@@ -1,4 +1,4 @@
-package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
+package tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints
 
 import tools.ambitious.pdfextractiontoolkit.extraction.StateBundle
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}

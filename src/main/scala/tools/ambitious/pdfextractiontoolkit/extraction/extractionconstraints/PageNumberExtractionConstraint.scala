@@ -1,12 +1,13 @@
-package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
+package tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints
 
 import tools.ambitious.pdfextractiontoolkit.extraction.StateBundle
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.TableExtractor
 import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.{SimpleTableMerger, TableMerger}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page}
 
 import scala.collection.immutable.Range.Inclusive
 
-case class PageNumberExtractionConstraint protected (pages: Set[Int], pageToTableTranslator: PageToTableTranslator) extends MergingSimpleExtractionConstraint {
+case class PageNumberExtractionConstraint protected (pages: Set[Int], tableExtractor: TableExtractor) extends MergingSimpleExtractionConstraint {
   if (pages.exists(_ <= 0)) {
     throw new IllegalArgumentException("Page numbers can only be positive numbers.")
   }
@@ -17,10 +18,10 @@ case class PageNumberExtractionConstraint protected (pages: Set[Int], pageToTabl
   override val tableMerger: TableMerger = SimpleTableMerger.create
 }
 object PageNumberExtractionConstraint {
-  def withPageNumberAndTranslator(pageNumber: Int, pageToTableTranslator: PageToTableTranslator) =
-    new PageNumberExtractionConstraint(Set(pageNumber), pageToTableTranslator)
+  def withPageNumberAndTableExtractor(pageNumber: Int, tableExtractor: TableExtractor) =
+    new PageNumberExtractionConstraint(Set(pageNumber), tableExtractor)
 
-  def withPageRangeAndTranslator(range: Inclusive, pageToTableTranslator: PageToTableTranslator) =
-    new PageNumberExtractionConstraint(Set(range: _*), pageToTableTranslator)
+  def withPageRangeAndTableExtractor(range: Inclusive, tableExtractor: TableExtractor) =
+    new PageNumberExtractionConstraint(Set(range: _*), tableExtractor)
 }
 

@@ -6,13 +6,13 @@ import tools.ambitious.pdfextractiontoolkit.model.geometry.Rectangle
 import tools.ambitious.pdfextractiontoolkit.model.{Page, Table}
 import tools.ambitious.pdfextractiontoolkit.util.TabulaConverter
 
-class RegionBasedPageToTableTranslator protected (val region: Rectangle) extends PageToTableTranslator {
+class RegionBasedTableExtractor protected (val region: Rectangle) extends TableExtractor {
   override def getTable(page: Page): Table = {
     val tabulaTable: tabula.Table = ExtractionUtils.extractTabulaTableFromPage(page, region)
     TabulaConverter.tableFromTabulaTable(tabulaTable)
   }
 }
 
-object RegionBasedPageToTableTranslator {
-  def forRegion(region: Rectangle) = new RegionBasedPageToTableTranslator(region)
+object RegionBasedTableExtractor {
+  def forRegion(region: Rectangle) = new RegionBasedTableExtractor(region)
 }

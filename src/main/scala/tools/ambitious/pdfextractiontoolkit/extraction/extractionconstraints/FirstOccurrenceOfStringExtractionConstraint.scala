@@ -1,11 +1,13 @@
-package tools.ambitious.pdfextractiontoolkit.extraction.tableextractors
+package tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints
 
 import technology.tabula
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.TableExtractor
 import tools.ambitious.pdfextractiontoolkit.extraction.{ExtractionUtils, StateBundle}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.Rectangle
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}
 
-case class FirstOccurrenceOfStringExtractionConstraint protected (text: String, textRegion: Rectangle, pageToTableTranslator: PageToTableTranslator) extends SimpleExtractionConstraint {
+case class FirstOccurrenceOfStringExtractionConstraint protected (text: String, textRegion: Rectangle, tableExtractor: TableExtractor)
+  extends SimpleExtractionConstraint {
 
   override def onPage(page: Page, document: Document, stateBundle: StateBundle): Unit = {
     if (shouldExtractOnPage(page, document, stateBundle)) {
@@ -32,6 +34,7 @@ case class FirstOccurrenceOfStringExtractionConstraint protected (text: String, 
 }
 
 object FirstOccurrenceOfStringExtractionConstraint {
-  def withTextAndTranslator(text: String, textRegion: Rectangle, pageToTableTranslator: PageToTableTranslator) = new FirstOccurrenceOfStringExtractionConstraint(text, textRegion, pageToTableTranslator)
+  def withTextAndTableExtractor(text: String, textRegion: Rectangle, tableExtractor: TableExtractor) =
+    new FirstOccurrenceOfStringExtractionConstraint(text, textRegion, tableExtractor)
 }
 
