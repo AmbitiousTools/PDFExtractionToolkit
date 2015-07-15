@@ -5,7 +5,7 @@ import tools.ambitious.pdfextractiontoolkit.extraction.{ExtractionUtils, StateBu
 import tools.ambitious.pdfextractiontoolkit.model.geometry.Rectangle
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}
 
-case class FirstOccurrenceOfStringTableExtractor protected (text: String, textRegion: Rectangle, region: Rectangle) extends SimpleTableExtractor {
+case class FirstOccurrenceOfStringExtractionConstraint protected (text: String, textRegion: Rectangle, pageToTableTranslator: PageToTableTranslator) extends SimpleExtractionConstraint {
 
   override def onPage(page: Page, document: Document, stateBundle: StateBundle): Unit = {
     if (shouldExtractOnPage(page, document, stateBundle)) {
@@ -15,7 +15,7 @@ case class FirstOccurrenceOfStringTableExtractor protected (text: String, textRe
 
   override def tableFromState(stateBundle: StateBundle): Option[Table] = {
     if (stateBundle.state.isDefined) {
-      val extractedTable: Table = performExtraction(stateBundle.state.asInstanceOf[Option[Page]].get, region)
+      val extractedTable: Table = performExtraction(stateBundle.state.asInstanceOf[Option[Page]].get)
 
       Option.apply(extractedTable)
     } else {
@@ -31,7 +31,7 @@ case class FirstOccurrenceOfStringTableExtractor protected (text: String, textRe
   }
 }
 
-object FirstOccurrenceOfStringTableExtractor {
-  def withTextAndRegion(text: String, textRegion: Rectangle, region: Rectangle) = new FirstOccurrenceOfStringTableExtractor(text, textRegion, region)
+object FirstOccurrenceOfStringExtractionConstraint {
+  def withTextAndTranslator(text: String, textRegion: Rectangle, pageToTableTranslator: PageToTableTranslator) = new FirstOccurrenceOfStringExtractionConstraint(text, textRegion, pageToTableTranslator)
 }
 

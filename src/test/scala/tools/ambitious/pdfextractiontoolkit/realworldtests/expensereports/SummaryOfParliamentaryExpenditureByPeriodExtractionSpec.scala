@@ -2,9 +2,10 @@ package tools.ambitious.pdfextractiontoolkit.realworldtests.expensereports
 
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.extraction.Extractor
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{TableExtractor, FirstOccurrenceOfStringTableExtractor}
-import tools.ambitious.pdfextractiontoolkit.model.{Table, Document}
-import tools.ambitious.pdfextractiontoolkit.model.geometry.{Size, PositivePoint, Rectangle}
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{ExtractionConstraint, FirstOccurrenceOfStringExtractionConstraint, RegionBasedPageToTableTranslator}
+import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
+import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -19,13 +20,16 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
     val textToFind = "Summary of Parliamentary Expenditure by Period"
     s"when provided to an extractor with the following regions looking for '$textToFind'" - {
-      val textRegion = Rectangle.fromCornerAndSize(PositivePoint.at(165, 90), Size.fromWidthAndHeight(280, 25))
       val tableRegion = Rectangle.fromCornerAndSize(PositivePoint.at(34, 138), Size.fromWidthAndHeight(540, 608))
-      val tableExtractor = FirstOccurrenceOfStringTableExtractor.withTextAndRegion(textToFind, textRegion, tableRegion)
+      val translator = RegionBasedPageToTableTranslator.forRegion(tableRegion)
+
+      val textRegion = Rectangle.fromCornerAndSize(PositivePoint.at(165, 90), Size.fromWidthAndHeight(280, 25))
+
+      val tableExtractor = FirstOccurrenceOfStringExtractionConstraint.withTextAndTranslator(textToFind, textRegion, translator)
 
       val extractor = Extractor.fromDocumentsAndExtractors(List(abbottTonyDocument, leighAndrewDocument), tableExtractor)
 
-      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
+      val tables: Map[Document, Map[ExtractionConstraint, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
       "the tony abbott document" - {
         "should return a single table" in {

@@ -1,13 +1,14 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
-import scala.concurrent.{Promise, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.TableExtractor
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.ExtractionConstraint
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Page, Table}
 
-class DocumentWalker protected (val document:Document, val tableExtractors: Set[TableExtractor]) {
-  private val stateBundles: Map[TableExtractor, StateBundle] = tableExtractors.map(_ -> StateBundle.create).toMap
-  private val promise: Promise[Map[TableExtractor, Table]] = Promise()
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
+
+class DocumentWalker protected (val document:Document, val tableExtractors: Set[ExtractionConstraint]) {
+  private val stateBundles: Map[ExtractionConstraint, StateBundle] = tableExtractors.map(_ -> StateBundle.create).toMap
+  private val promise: Promise[Map[ExtractionConstraint, Table]] = Promise()
 
   private def run() =
     Future {
@@ -23,14 +24,14 @@ class DocumentWalker protected (val document:Document, val tableExtractors: Set[
       callOnEndOnTableExtractors()
   }
 
-  private def getCompletedTables: Map[TableExtractor, Table] =
+  private def getCompletedTables: Map[ExtractionConstraint, Table] =
     tableExtractors
       .map(tableExtractor => tableExtractor -> tableExtractor.tableFromState(stateBundles(tableExtractor)))
-      .filter((tuple: (TableExtractor, Option[Table])) => tuple._2.isDefined)
-      .map((tuple: (TableExtractor, Option[Table])) => tuple._1 -> tuple._2.get)
+      .filter((tuple: (ExtractionConstraint, Option[Table])) => tuple._2.isDefined)
+      .map((tuple: (ExtractionConstraint, Option[Table])) => tuple._1 -> tuple._2.get)
       .toMap
 
-  def getTables: Future[Map[TableExtractor, Table]] =
+  def getTables: Future[Map[ExtractionConstraint, Table]] =
     promise.future
 
   private def callOnStartOnTableExtractors() =
@@ -44,15 +45,15 @@ class DocumentWalker protected (val document:Document, val tableExtractors: Set[
 }
 
 object DocumentWalker {
-  def toWalkWithTableExtractors(document: Document, tableExtractors: Set[TableExtractor]): DocumentWalker = {
+  def toWalkWithTableExtractors(document: Document, tableExtractors: Set[ExtractionConstraint]): DocumentWalker = {
     val walker = new DocumentWalker(document, tableExtractors)
     walker.run()
     walker
   }
 
-  def toWalkWithTableExtractors(document: Document, tableExtractors: Seq[TableExtractor]): DocumentWalker =
+  def toWalkWithTableExtractors(document: Document, tableExtractors: Seq[ExtractionConstraint]): DocumentWalker =
     toWalkWithTableExtractors(document, tableExtractors.toSet)
 
-  def toWalkWithTableExtractor(document: Document, tableExtractor: TableExtractor): DocumentWalker =
+  def toWalkWithTableExtractor(document: Document, tableExtractor: ExtractionConstraint): DocumentWalker =
     toWalkWithTableExtractors(document, Seq(tableExtractor))
 }

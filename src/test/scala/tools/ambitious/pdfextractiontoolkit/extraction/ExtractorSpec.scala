@@ -1,24 +1,26 @@
 package tools.ambitious.pdfextractiontoolkit.extraction
 
 import org.scalatest.FreeSpec
-import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{TableExtractor, FirstOccurrenceOfStringTableExtractor, PageNumberTableExtractor}
+import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.{ExtractionConstraint, FirstOccurrenceOfStringExtractionConstraint, PageNumberExtractionConstraint, RegionBasedPageToTableTranslator}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class ExtractorSpec extends FreeSpec {
-  s"An ${Extractor.getClass.getSimpleName} with a document and a ${PageNumberTableExtractor.getClass.getSimpleName}" - {
+  s"An ${Extractor.getClass.getSimpleName} with a document and a ${PageNumberExtractionConstraint.getClass.getSimpleName}" - {
     val document: Document = Document.fromPDFPath(simpleTest1TableURL)
 
-    val window: Rectangle = Rectangle.fromCornerCoords(108, 81, 312, 305)
-    val tableExtractor = PageNumberTableExtractor.withPageNumberAndRegion(1, window)
+    val region: Rectangle = Rectangle.fromCornerCoords(108, 81, 312, 305)
+    val pageToTableTranslator = RegionBasedPageToTableTranslator.forRegion(region)
+    val tableExtractor = PageNumberExtractionConstraint.withPageNumberAndTranslator(1, pageToTableTranslator)
 
     val extractor: Extractor = Extractor.fromDocumentAndExtractors(document, tableExtractor)
 
     "should be able to extract the table and have it match the values from it's corresponding CSV file" in {
-      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
+      val tables: Map[Document, Map[ExtractionConstraint, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
       document.close()
 
@@ -29,17 +31,19 @@ class ExtractorSpec extends FreeSpec {
     }
   }
 
-  s"An ${Extractor.getClass.getSimpleName} with one document and a ${FirstOccurrenceOfStringTableExtractor.getClass.getSimpleName}" - {
+  s"An ${Extractor.getClass.getSimpleName} with one document and a ${FirstOccurrenceOfStringExtractionConstraint.getClass.getSimpleName}" - {
     val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
 
     val region: Rectangle = Rectangle.fromCornerAndSize(PositivePoint.at(168.48, 273.95), Size.fromWidthAndHeight(213.54, 303.5))
+    val pageToTableTranslator = RegionBasedPageToTableTranslator.forRegion(region)
+
     val textRegion: Rectangle = Rectangle.fromCornerAndSize(PositivePoint.at(185.38, 165.62), Size.fromWidthAndHeight(112.64, 16.16))
-    val tableExtractor = FirstOccurrenceOfStringTableExtractor.withTextAndRegion("An example Title", textRegion, region)
+    val tableExtractor = FirstOccurrenceOfStringExtractionConstraint.withTextAndTranslator("An example Title", textRegion, pageToTableTranslator)
 
     val extractor: Extractor = Extractor.fromDocumentAndExtractors(document, tableExtractor)
 
     "should be able to extract the table and have it match the values from it's corresponding CSV file" in {
-      val tables: Map[Document, Map[TableExtractor, Table]] = Await.result(extractor.extractTables, 60.seconds)
+      val tables: Map[Document, Map[ExtractionConstraint, Table]] = Await.result(extractor.extractTables, 60.seconds)
 
       document.close()
 

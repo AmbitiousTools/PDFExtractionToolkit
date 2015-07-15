@@ -6,20 +6,22 @@ import tools.ambitious.pdfextractiontoolkit.extraction.tablemergers.SimpleTableM
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 import tools.ambitious.pdfextractiontoolkit.util.CSVUtil
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class PageNumberTableExtractorSpec extends FreeSpec {
   val region: Rectangle = Rectangle.fromCornerAndSize(PositivePoint.at(168.48, 240), Size.fromWidthAndHeight(213.54, 340))
+  val pageToTableTranslator = RegionBasedPageToTableTranslator.forRegion(region)
 
-  s"A ${PageNumberTableExtractor.getClass.getSimpleName}" - {
+  s"A ${PageNumberExtractionConstraint.getClass.getSimpleName}" - {
     "for page 2" - {
-      val tableExtractor: PageNumberTableExtractor = PageNumberTableExtractor.withPageNumberAndRegion(2, region)
+      val tableExtractor: PageNumberExtractionConstraint = PageNumberExtractionConstraint.withPageNumberAndTranslator(2, pageToTableTranslator)
 
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
         val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
-        val tables: Map[TableExtractor, Table] = Await.result(walker.getTables, 60.seconds)
+        val tables: Map[ExtractionConstraint, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the table at page 2" in {
           val table: Option[Table] = tables.get(tableExtractor)
@@ -31,13 +33,13 @@ class PageNumberTableExtractorSpec extends FreeSpec {
     }
 
     "for a page range from 1 to 2" - {
-      val tableExtractor: PageNumberTableExtractor =
-        PageNumberTableExtractor.withPageRangeAndRegion(Range.inclusive(1, 2), region)
+      val tableExtractor: PageNumberExtractionConstraint =
+        PageNumberExtractionConstraint.withPageRangeAndTranslator(Range.inclusive(1, 2), pageToTableTranslator)
 
       "when put through a walker with test document 2" - {
         val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
         val walker: DocumentWalker = DocumentWalker.toWalkWithTableExtractor(document, tableExtractor)
-        val tables: Map[TableExtractor, Table] = Await.result(walker.getTables, 60.seconds)
+        val tables: Map[ExtractionConstraint, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the two tables merged" in {
           val table: Option[Table] = tables.get(tableExtractor)
@@ -57,7 +59,10 @@ class PageNumberTableExtractorSpec extends FreeSpec {
 
     s"instantiated for a page number less than 1 should throw an IllegalArgumentException" - {
       val instantiatePageNumberTableExtractor = intercept[IllegalArgumentException] {
-        PageNumberTableExtractor.withPageNumberAndRegion(0, Rectangle.fromCornerCoords(0, 0, 0, 0))
+
+        val dummyTranslator = RegionBasedPageToTableTranslator.forRegion(Rectangle.fromCornerCoords(0, 0, 0, 0))
+
+        PageNumberExtractionConstraint.withPageNumberAndTranslator(0, dummyTranslator)
       }
       assert(instantiatePageNumberTableExtractor.getMessage === "Page numbers can only be positive numbers.")
     }
