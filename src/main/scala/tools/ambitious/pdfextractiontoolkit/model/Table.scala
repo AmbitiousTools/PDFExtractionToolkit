@@ -10,7 +10,9 @@ class Table(val rows: List[Row] = Nil) {
       throw new IllegalArgumentException("Invalid row number.")
   }
 
-  def numberOfRows: Int = rows.length
+  lazy val numberOfRows: Int = rows.length
+
+  lazy val numberOfColumns: Int = rows.map(_.numberOfCells).max
 
   override def toString: String =
     rows.map(row => row.toString).mkString("\n")
