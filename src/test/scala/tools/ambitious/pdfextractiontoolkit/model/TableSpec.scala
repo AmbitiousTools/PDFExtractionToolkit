@@ -16,6 +16,10 @@ class TableSpec extends FreeSpec {
       assert(table.numberOfRows == 1)
     }
 
+    "should have one column" in {
+      assert(table.numberOfColumns == 1)
+    }
+
     "should have it's first row equal to the row we set" in {
       assert(table.getRow(1) == row)
     }
@@ -32,6 +36,10 @@ class TableSpec extends FreeSpec {
 
     "should have two rows" in {
       assert(table.numberOfRows == 2)
+    }
+
+    "should have three columns" in {
+      assert(table.numberOfColumns == 3)
     }
 
     "should have it's first row equal to the first row we set" in {
@@ -55,6 +63,10 @@ class TableSpec extends FreeSpec {
 
     "should have three rows" in {
       assert(table.numberOfRows == 3)
+    }
+
+    "should have one column" in {
+      assert(table.numberOfColumns == 1)
     }
 
     "should have it's first row equal to the first row we set" in {

@@ -1,9 +1,9 @@
 package tools.ambitious.pdfextractiontoolkit.realworldtests.expensereports
 
 import org.scalatest.FreeSpec
-import tools.ambitious.pdfextractiontoolkit.extraction.Extractor
-import tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints.{ExtractionConstraint, FirstOccurrenceOfStringExtractionConstraint}
+import tools.ambitious.pdfextractiontoolkit.extraction.extractionconstraints.FirstOccurrenceOfStringExtractionConstraint
 import tools.ambitious.pdfextractiontoolkit.extraction.tableextractors.RegionBasedTableExtractor
+import tools.ambitious.pdfextractiontoolkit.extraction.{ExtractionResult, Extractor}
 import tools.ambitious.pdfextractiontoolkit.model.geometry.{PositivePoint, Rectangle, Size}
 import tools.ambitious.pdfextractiontoolkit.model.{Document, Table}
 
@@ -30,14 +30,14 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
       val extractor = Extractor.fromDocumentsAndConstraints(List(abbottTonyDocument, leighAndrewDocument), extractionConstraint)
 
-      val tables: Map[Document, Map[ExtractionConstraint, Table]] = Await.result(extractor.extractTables, 60.seconds)
+      val extractionResult: ExtractionResult = Await.result(extractor.extractTables, 60.seconds)
 
       "the tony abbott document" - {
         "should return a single table" in {
-          assert(tables(abbottTonyDocument).get(extractionConstraint).isDefined)
+          assert(extractionResult.getResults(abbottTonyDocument)(extractionConstraint).isDefined)
         }
 
-        val table: Table = tables(abbottTonyDocument)(extractionConstraint)
+        val table: Table = extractionResult(abbottTonyDocument)(extractionConstraint)
 
         val expectedRows = 24
         s"should have $expectedRows rows in the returned table" in {
@@ -50,10 +50,10 @@ class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
 
       "the andrew leigh document" - {
         "should return a single table" in {
-          assert(tables(leighAndrewDocument).get(extractionConstraint).isDefined)
+          assert(extractionResult.getResults(leighAndrewDocument)(extractionConstraint).isDefined)
         }
 
-        val table: Table = tables(leighAndrewDocument)(extractionConstraint)
+        val table: Table = extractionResult(leighAndrewDocument)(extractionConstraint)
 
         val expectedRows = 26
         s"should have $expectedRows rows in the returned table" in {

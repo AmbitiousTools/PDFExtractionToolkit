@@ -18,11 +18,13 @@ class Extractor protected(private val documents: List[Document], private val ext
     promise.future
   }
 
-  def extractTables: Future[Map[Document, Map[ExtractionConstraint, Table]]] = {
+  def extractTables: Future[ExtractionResult] = {
     val documentMap: Map[Document, Future[Map[ExtractionConstraint, Table]]] =
       documents.map(document => document -> extractTablesFromDocument(document)).toMap
 
-    Future.sequence(documentMap.map(entry => entry._2.map(i => (entry._1, i)))).map(_.toMap)
+    Future.sequence(documentMap.map(entry => entry._2.map(i => (entry._1, i))))
+      .map(_.toMap)
+      .map(ExtractionResult.withResultsMap)
   }
 }
 
