@@ -18,6 +18,7 @@ val sprayV = "1.3.3"
 
 libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % "test",
 
   "tabula-extractor" % "tabula-extractor" % "0.7.4-SNAPSHOT",
 
