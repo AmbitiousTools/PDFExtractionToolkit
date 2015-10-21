@@ -1,9 +1,9 @@
 package tools.ambitious.pdfextractiontoolkit.webapp.services.documentstorage
 
 private trait DocumentInformationDao {
-  def recordDocumentStored(docID: DocumentIdentifier): Unit
+  def storeDocumentID(docID: DocumentIdentifier): Unit
 
-  def recordDocumentDeleted(docID: DocumentIdentifier): Unit
+  def deleteDocumentID(docID: DocumentIdentifier): Unit
 
   def retrieveAllIDs(): Seq[DocumentIdentifier]
 }

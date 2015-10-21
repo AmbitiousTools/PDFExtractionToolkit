@@ -4,10 +4,10 @@ import scala.io.Source
 
 private trait DocumentFileStore {
 
-  def put(docID: DocumentIdentifier, source: Source)
+  def storeFileFor(docID: DocumentIdentifier, source: Source)
 
-  def get(docID: DocumentIdentifier): Source
+  def retrieveFileFor(docID: DocumentIdentifier): Source
 
-  def delete(docID: DocumentIdentifier)
+  def deleteFileFor(docID: DocumentIdentifier)
 
 }

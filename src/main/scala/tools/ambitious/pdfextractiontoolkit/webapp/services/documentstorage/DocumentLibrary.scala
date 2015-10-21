@@ -7,9 +7,9 @@ import scala.io.Source
  */
 trait DocumentLibrary {
 
-  def put(description: DocumentDescription, documentSource: Source): DocumentIdentifier
+  def store(description: DocumentDescription, documentSource: Source): DocumentIdentifier
 
-  def get(docID: DocumentIdentifier): Source
+  def retrieve(docID: DocumentIdentifier): Source
 
   def delete(docID: DocumentIdentifier)
 

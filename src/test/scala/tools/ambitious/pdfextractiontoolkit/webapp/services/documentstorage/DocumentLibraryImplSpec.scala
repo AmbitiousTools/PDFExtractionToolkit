@@ -26,25 +26,25 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
 
     "will store a document when put is called" in {
 
-      (mockFileStore.put _).expects(expectedID, source)
+      (mockFileStore.storeFileFor _).expects(expectedID, source)
 
-      documentLibrary.put(description, source)
+      documentLibrary.store(description, source)
 
-      (stubDao.recordDocumentStored _).verify(expectedID)
+      (stubDao.storeDocumentID _).verify(expectedID)
     }
 
     "will retrieve a document when get is called" in {
-      (mockFileStore.get _).expects(expectedID).returns(source)
+      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(source)
 
-      documentLibrary.get(expectedID)
+      assert(documentLibrary.retrieve(expectedID) sameElements source)
     }
 
     "will delete a document when delete is called" in {
-      (mockFileStore.delete _).expects(expectedID)
+      (mockFileStore.deleteFileFor _).expects(expectedID)
 
       documentLibrary.delete(expectedID)
 
-      (stubDao.recordDocumentDeleted _).verify(expectedID)
+      (stubDao.deleteDocumentID _).verify(expectedID)
     }
 
     "will list all documents when list is called" in {
