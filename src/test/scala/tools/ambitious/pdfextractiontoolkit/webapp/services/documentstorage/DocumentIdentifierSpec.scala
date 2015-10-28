@@ -7,7 +7,7 @@ class DocumentIdentifierSpec extends FreeSpec {
   s"a ${DocumentIdentifier.getClass.getSimpleName}" - {
 
     "created with a hash and a description" - {
-      val hash: List[Byte] = List(0x42, 0x5a).map(_.toByte)
+      val hash: String = "425A"
       val description: DocumentDescription = DocumentDescription.withTitle("testDoc")
       
       val docID: DocumentIdentifier = DocumentIdentifier.withHashAndDescription(hash, description)

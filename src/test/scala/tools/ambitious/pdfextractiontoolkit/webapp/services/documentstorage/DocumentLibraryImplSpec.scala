@@ -16,11 +16,7 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
     val description: DocumentDescription = DocumentDescription.withTitle("testTitle")
     val source: Source = Source.fromChar('x')
 
-    val expectedHash: List[Byte] = List(
-      45, 113, 22, 66, -73, 38, -80, 68, 1, 98, 124, -87, -5, -84, 50,
-      -11, -56, 83, 15, -79, -112, 60, -60, -37, 2, 37, -121, 23, -110,
-      26, 72, -127
-    ).map(_.toByte)
+    val expectedHash: String = "2D711642B726B04401627CA9FBAC32F5C8530FB1903CC4DB02258717921A4881"
 
     val expectedID: DocumentIdentifier = DocumentIdentifier.withHashAndDescription(expectedHash, description)
 

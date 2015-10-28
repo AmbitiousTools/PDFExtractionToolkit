@@ -29,7 +29,9 @@ libraryDependencies ++= Seq(
   "io.spray"            %%  "spray-testkit" % sprayV  % "test",
   "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
   "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
-  "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test"
+  "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",
+
+  "commons-io" % "commons-io" % "2.4"
 )
 
 Revolver.settings: Seq[sbt.Def.Setting[_]]
