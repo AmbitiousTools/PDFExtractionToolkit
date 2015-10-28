@@ -4,23 +4,28 @@ import java.security.MessageDigest
 
 import scala.io.Source
 
-case class DocumentIdentifier protected(hash: List[Byte],
+case class DocumentIdentifier protected(hash: String,
                                         description: DocumentDescription) {
 }
 
 object DocumentIdentifier {
 
   def computeFor(documentDescription: DocumentDescription, documentSource: Source): DocumentIdentifier = {
-    val hash: Array[Byte] = computeHash(documentSource)
+    val hash: String = computeHashAsHex(documentSource)
 
     withHashAndDescription(hash, documentDescription)
   }
 
   // TODO make utility method
-  def computeHash(source: Source): Array[Byte] = digest.digest(source.map(_.toByte).toArray)
+  def computeHashAsHex(source: Source): String = {
+    digest.digest(source.reset().map(_.toByte).toArray)
+      .map("%02X" format _)
+      .mkString
+  }
 
   private val digest: MessageDigest = MessageDigest.getInstance("SHA-256")
 
-  def withHashAndDescription(hash: Iterable[Byte], description: DocumentDescription): DocumentIdentifier =
-    new DocumentIdentifier(hash.toList, description)
+  def withHashAndDescription(hash: String, description: DocumentDescription): DocumentIdentifier =
+    new DocumentIdentifier(hash, description)
+
 }
