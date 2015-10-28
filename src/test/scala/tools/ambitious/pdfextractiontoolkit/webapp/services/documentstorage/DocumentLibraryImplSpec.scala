@@ -20,7 +20,7 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
 
     val expectedID: DocumentIdentifier = DocumentIdentifier.withHashAndDescription(expectedHash, description)
 
-    "will store a document when put is called" in {
+    "will store a document when store is called" in {
 
       (mockFileStore.storeFileFor _).expects(expectedID, source)
 
@@ -29,10 +29,10 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
       (stubDao.storeDocumentID _).verify(expectedID)
     }
 
-    "will retrieve a document when get is called" in {
-      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(source)
+    "will retrieve a document when retrieve is called" in {
+      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(source.reset())
 
-      assert(documentLibrary.retrieve(expectedID) sameElements source)
+      assert(documentLibrary.retrieve(expectedID) sameElements source.reset())
     }
 
     "will delete a document when delete is called" in {
