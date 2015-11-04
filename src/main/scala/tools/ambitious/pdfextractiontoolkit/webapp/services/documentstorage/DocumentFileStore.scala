@@ -1,12 +1,12 @@
 package tools.ambitious.pdfextractiontoolkit.webapp.services.documentstorage
 
-import scala.io.Source
+import java.net.URL
 
 private trait DocumentFileStore {
 
-  def storeFileFor(docID: DocumentIdentifier, source: Source)
+  def storeFileFor(docID: DocumentIdentifier, documentSource: URL)
 
-  def retrieveFileFor(docID: DocumentIdentifier): Source
+  def retrieveFileFor(docID: DocumentIdentifier): URL
 
   def deleteFileFor(docID: DocumentIdentifier)
 

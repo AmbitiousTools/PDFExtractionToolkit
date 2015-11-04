@@ -1,6 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.library.extraction.extractionconstraints
 
 import org.scalatest.FreeSpec
+import tools.ambitious.pdfextractiontoolkit.Resources
 import tools.ambitious.pdfextractiontoolkit.library.extraction._
 import tools.ambitious.pdfextractiontoolkit.library.extraction.tableextractors.RegionBasedTableExtractor
 import tools.ambitious.pdfextractiontoolkit.library.extraction.tablemergers.SimpleTableMerger
@@ -20,13 +21,13 @@ class PageNumberExtractionConstraintSpec extends FreeSpec {
       val extractionConstraint: PageNumberExtractionConstraint = PageNumberExtractionConstraint.withPageNumberAndTableExtractor(2, tableExtractor)
 
       "when put through a walker with test document 2" - {
-        val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
+        val document: Document = Document.fromPDFPath(Resources.simpleTest2Tables2TitleURL)
         val walker: DocumentWalker = DocumentWalker.toWalkWithExtractionConstraint(document, extractionConstraint)
         val tables: Map[ExtractionConstraint, Table] = Await.result(walker.getTables, 60.seconds)
 
         "should return the table at page 2" in {
           val table: Option[Table] = tables.get(extractionConstraint)
-          val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
+          val tableFromCSV: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage2CSVURL)
 
           assert(table.get == tableFromCSV)
         }
@@ -38,7 +39,7 @@ class PageNumberExtractionConstraintSpec extends FreeSpec {
         PageNumberExtractionConstraint.withPageRangeAndTableExtractor(Range.inclusive(1, 2), tableExtractor)
 
       "when put through a walker with test document 2" - {
-        val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
+        val document: Document = Document.fromPDFPath(Resources.simpleTest2Tables2TitleURL)
         val walker: DocumentWalker = DocumentWalker.toWalkWithExtractionConstraint(document, extractionConstraint)
         val tables: Map[ExtractionConstraint, Table] = Await.result(walker.getTables, 60.seconds)
 
@@ -47,8 +48,8 @@ class PageNumberExtractionConstraintSpec extends FreeSpec {
 
           val tableMerger: SimpleTableMerger = SimpleTableMerger.create
 
-          val table1: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage1CSVURL)
-          val table2: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
+          val table1: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage1CSVURL)
+          val table2: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage2CSVURL)
           val tablesToMerge: List[Table] = List(table1, table2)
 
           val tableFromCSV: Table = tableMerger.mergeTables(tablesToMerge).get

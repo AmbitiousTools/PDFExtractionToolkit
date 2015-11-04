@@ -1,14 +1,14 @@
 package tools.ambitious.pdfextractiontoolkit.library.extraction.tablemergers
 
 import org.scalatest.FreeSpec
-import tools.ambitious.pdfextractiontoolkit.library.extraction.{simpleTest2Tables2TitlePage1CSVURL, simpleTest2Tables2TitlePage2CSVURL}
+import tools.ambitious.pdfextractiontoolkit.Resources
 import tools.ambitious.pdfextractiontoolkit.library.model.Table
 import tools.ambitious.pdfextractiontoolkit.library.util.CSVUtil
 
 class SimpleTableMergerSpec extends FreeSpec {
 
-  private val table1: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage1CSVURL)
-  private val table2: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
+  private val table1: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage1CSVURL)
+  private val table2: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage2CSVURL)
   private val tables: List[Table] = List(table1, table2)
 
   s"A ${SimpleTableMerger.getClass.getSimpleName}" - {
