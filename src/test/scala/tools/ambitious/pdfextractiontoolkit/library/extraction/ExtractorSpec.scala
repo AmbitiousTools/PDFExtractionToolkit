@@ -1,6 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.library.extraction
 
 import org.scalatest.FreeSpec
+import tools.ambitious.pdfextractiontoolkit.Resources
 import tools.ambitious.pdfextractiontoolkit.library.extraction.extractionconstraints.{FirstOccurrenceOfStringExtractionConstraint, PageNumberExtractionConstraint}
 import tools.ambitious.pdfextractiontoolkit.library.extraction.tableextractors.RegionBasedTableExtractor
 import tools.ambitious.pdfextractiontoolkit.library.model.geometry.{PositivePoint, Rectangle, Size}
@@ -12,7 +13,7 @@ import scala.concurrent.duration._
 
 class ExtractorSpec extends FreeSpec {
   s"An ${Extractor.getClass.getSimpleName} with a document and a ${PageNumberExtractionConstraint.getClass.getSimpleName}" - {
-    val document: Document = Document.fromPDFPath(simpleTest1TableURL)
+    val document: Document = Document.fromPDFPath(Resources.simpleTest1TableURL)
 
     val region: Rectangle = Rectangle.fromCornerCoords(108, 81, 312, 305)
     val tableExtractor = RegionBasedTableExtractor.forRegion(region)
@@ -26,14 +27,14 @@ class ExtractorSpec extends FreeSpec {
       document.close()
 
       val table: Table = extractionResult(document)(extractionConstraint)
-      val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest1TableCSVURL)
+      val tableFromCSV: Table = CSVUtil.tableFromURL(Resources.simpleTest1TableCSVURL)
 
       assert(table == tableFromCSV)
     }
   }
 
   s"An ${Extractor.getClass.getSimpleName} with one document and a ${FirstOccurrenceOfStringExtractionConstraint.getClass.getSimpleName}" - {
-    val document: Document = Document.fromPDFPath(simpleTest2Tables2TitleURL)
+    val document: Document = Document.fromPDFPath(Resources.simpleTest2Tables2TitleURL)
 
     val region: Rectangle = Rectangle.fromCornerAndSize(PositivePoint.at(168.48, 273.95), Size.fromWidthAndHeight(213.54, 303.5))
     val tableExtractor = RegionBasedTableExtractor.forRegion(region)
@@ -49,7 +50,7 @@ class ExtractorSpec extends FreeSpec {
       document.close()
 
       val table: Table = extractionResult(document)(extractionConstraint)
-      val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
+      val tableFromCSV: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage2CSVURL)
 
       assert(table == tableFromCSV)
     }

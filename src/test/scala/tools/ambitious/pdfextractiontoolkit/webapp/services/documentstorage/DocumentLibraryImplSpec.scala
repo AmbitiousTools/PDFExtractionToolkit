@@ -1,9 +1,10 @@
 package tools.ambitious.pdfextractiontoolkit.webapp.services.documentstorage
 
+import java.net.URL
+
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.FreeSpec
-
-import scala.io.Source
+import tools.ambitious.pdfextractiontoolkit.Resources
 
 class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
 
@@ -14,9 +15,9 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
     val documentLibrary: DocumentLibraryImpl = new DocumentLibraryImpl(mockFileStore, stubDao)
 
     val description: DocumentDescription = DocumentDescription.withTitle("testTitle")
-    val source: Source = Source.fromChar('x')
+    val source: URL = Resources.quickBrownFoxTxt
 
-    val expectedHash: String = "2D711642B726B04401627CA9FBAC32F5C8530FB1903CC4DB02258717921A4881"
+    val expectedHash: String = "58B433FA7E8B0F94B2FF02178E7768F5A329EF346D908C7B917824E5A4CA9575"
 
     val expectedID: DocumentIdentifier = DocumentIdentifier.withHashAndDescription(expectedHash, description)
 
@@ -30,9 +31,9 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
     }
 
     "will retrieve a document when retrieve is called" in {
-      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(source.reset())
+      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(source)
 
-      assert(documentLibrary.retrieve(expectedID) sameElements source.reset())
+      assert(documentLibrary.retrieve(expectedID) == source)
     }
 
     "will delete a document when delete is called" in {

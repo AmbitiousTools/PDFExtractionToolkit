@@ -1,6 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.library.extraction.extractionconstraints
 
 import org.scalatest.FreeSpec
+import tools.ambitious.pdfextractiontoolkit.Resources
 import tools.ambitious.pdfextractiontoolkit.library.extraction._
 import tools.ambitious.pdfextractiontoolkit.library.extraction.tableextractors.RegionBasedTableExtractor
 import tools.ambitious.pdfextractiontoolkit.library.model.geometry.{PositivePoint, Rectangle, Size}
@@ -29,7 +30,7 @@ class FirstOccurrenceOfStringExtractionConstraintSpec extends FreeSpec {
 
       "should return the table at page 2" in {
         val table: Option[Table] = tables.get(extractionConstraint)
-        val tableFromCSV: Table = CSVUtil.tableFromURL(simpleTest2Tables2TitlePage2CSVURL)
+        val tableFromCSV: Table = CSVUtil.tableFromURL(Resources.simpleTest2Tables2TitlePage2CSVURL)
 
         assert(table.get == tableFromCSV)
       }
