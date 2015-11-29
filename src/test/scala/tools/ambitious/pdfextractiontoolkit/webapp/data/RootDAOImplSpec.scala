@@ -14,6 +14,7 @@ class RootDAOImplSpec extends FreeSpec {
 
   "the root DAO" - {
     val dao: RootDAO = RootDAO.forConfigName(DAOTestUtils.testConfigName)
+    DAOTestUtils.testDBFile.getParent.toFile.mkdirs()
 
     "if the database doesn't exist" - {
 

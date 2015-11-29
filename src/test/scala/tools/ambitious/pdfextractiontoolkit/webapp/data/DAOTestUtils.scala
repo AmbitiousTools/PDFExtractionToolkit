@@ -18,6 +18,7 @@ object DAOTestUtils {
 
   def constructCleanRootDAO: RootDAO = {
     Files.deleteIfExists(testDBFile)
+    DAOTestUtils.testDBFile.getParent.toFile.mkdirs()
 
     val rootDAO: RootDAO = RootDAO.forConfigName(testConfigName)
 
