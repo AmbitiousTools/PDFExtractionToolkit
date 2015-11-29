@@ -8,3 +8,7 @@ private[data] trait ToolkitDAO {
 
   def initialiseIfNeeded(): Future[Unit]
 }
+
+private[data] object ToolkitDAO {
+  def forConfigName(configName: String): ToolkitDAO = new ToolkitDAOImpl(configName)
+}
