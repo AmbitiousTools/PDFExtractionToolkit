@@ -5,16 +5,21 @@ import java.nio.file.Path
 
 import org.apache.commons.io.FileUtils
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 private class DocumentFileStoreImpl(val workingDirectory: Path) extends DocumentFileStore {
 
-  override def storeFileFor(docID: DocumentIdentifier, source: URL): Unit = {
-    val fileName: String = docID.hash
-    val outputFile: Path = workingDirectory.resolve(fileName)
+  override def storeFileFor(docID: DocumentIdentifier, source: URL): Future[Unit] = {
+    Future {
+      val fileName: String = docID.hash
+      val outputFile: Path = workingDirectory.resolve(fileName)
 
-    FileUtils.copyURLToFile(source, outputFile.toFile)
+      FileUtils.copyURLToFile(source, outputFile.toFile)
+    }
   }
 
-  override def deleteFileFor(docID: DocumentIdentifier): Unit = {}
+  override def deleteFileFor(docID: DocumentIdentifier): Future[Unit] = ???
 
-  override def retrieveFileFor(docID: DocumentIdentifier): URL = ???
+  override def retrieveFileFor(docID: DocumentIdentifier): Future[URL] = ???
 }

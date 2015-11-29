@@ -1,36 +1,30 @@
 package tools.ambitious.pdfextractiontoolkit.webapp.data
 
 import java.net.URL
-import java.nio.file.{Files, Paths, Path}
+import java.nio.file.Files
 
-import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.FreeSpec
 import slick.jdbc.meta.MTable
 import tools.ambitious.pdfextractiontoolkit.utils.AmbitiousIoUtils.{ByteArrayUtils, URLUtils}
 
-import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
-class ToolkitDAOImplSpec extends FreeSpec {
+class RootDAOImplSpec extends FreeSpec {
 
-  private val config: Config = ConfigFactory.load()
-
-  "the Toolkit DAO" - {
-    val dao: ToolkitDAO = ToolkitDAO.forConfigName("testDB")
-    val testDBPath: String = config.getString("testDB.path")
-
-    val testDBFile: Path = Paths.get(testDBPath)
+  "the root DAO" - {
+    val dao: RootDAO = RootDAO.forConfigName(DAOTestUtils.testConfigName)
 
     "if the database doesn't exist" - {
 
-      Files.deleteIfExists(testDBFile)
+      Files.deleteIfExists(DAOTestUtils.testDBFile)
 
       "a call to initialiseIfNeeded" - {
 
         Await.result(dao.initialiseIfNeeded(), 30.seconds)
 
         "will create a database" in {
-          assert(Files.exists(testDBFile))
+          assert(Files.exists(DAOTestUtils.testDBFile))
         }
 
         "will create the correct tables" in {
@@ -55,7 +49,7 @@ class ToolkitDAOImplSpec extends FreeSpec {
       dao.initialiseIfNeeded()
 
       "does not change the database" in {
-        val testDBUrl: URL = testDBFile.toUri.toURL
+        val testDBUrl: URL = DAOTestUtils.testDBFile.toUri.toURL
 
         val originalHash = testDBUrl
           .toBytes
