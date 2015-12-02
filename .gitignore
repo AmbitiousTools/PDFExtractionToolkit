@@ -9,4 +9,5 @@
 .idea
 out
 .DS_Store
-working
+/working/
+/test_working/
