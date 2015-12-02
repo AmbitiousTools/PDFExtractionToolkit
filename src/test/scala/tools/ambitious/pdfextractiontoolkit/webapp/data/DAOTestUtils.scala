@@ -3,6 +3,7 @@ package tools.ambitious.pdfextractiontoolkit.webapp.data
 import java.nio.file.{Files, Path, Paths}
 
 import com.typesafe.config.{Config, ConfigFactory}
+import org.apache.commons.io.FileUtils
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -10,14 +11,17 @@ import scala.concurrent.duration._
 object DAOTestUtils {
   private val applicationConfig: Config = ConfigFactory.load()
 
-  private val workingDirPathFromConfig: String = applicationConfig.getString("workingDir")
+  private val workingDirPathFromConfig: String = applicationConfig.getString("testWorkingDir")
+
+  private val workingDir: Path = Paths.get(workingDirPathFromConfig)
 
   def createAndGetWorkingDirectory(): Path = {
-    val workingDir: Path = Paths.get(workingDirPathFromConfig)
-
     workingDir.toFile.mkdirs()
-
     workingDir
+  }
+
+  def cleanWorkingDirectory(): Unit = {
+    FileUtils.deleteQuietly(workingDir.toFile)
   }
 
   private val testDBPathFromConfig: String = applicationConfig.getString("testDB.path")

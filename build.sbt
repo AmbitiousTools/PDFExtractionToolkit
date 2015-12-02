@@ -35,7 +35,10 @@ libraryDependencies ++= Seq(
   "org.xerial"          %   "sqlite-jdbc"   % "3.8.11.2",
   "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",
 
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+
+  "log4j" % "log4j" % "1.2.14"
+
 )
 
 Revolver.settings: Seq[sbt.Def.Setting[_]]
