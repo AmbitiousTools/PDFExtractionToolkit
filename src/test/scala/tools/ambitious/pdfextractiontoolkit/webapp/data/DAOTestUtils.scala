@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 object DAOTestUtils {
   private val applicationConfig: Config = ConfigFactory.load()
 
-  private val workingDirPathFromConfig: String = applicationConfig.getString("workingDir")
+  private val workingDirPathFromConfig: String = applicationConfig.getString("testWorkingDir")
 
   def createAndGetWorkingDirectory(): Path = {
     val workingDir: Path = Paths.get(workingDirPathFromConfig)
