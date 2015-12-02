@@ -13,7 +13,7 @@ import scala.concurrent.{Await, Future}
 class RootDAOImplSpec extends FreeSpec {
 
   "the root DAO" - {
-    val dao: RootDAO = RootDAO.forConfigName(DAOTestUtils.testConfigName)
+    val dao: RootDAO = RootDAO.forConfigName(DAOTestUtils.testDBConfigName)
     DAOTestUtils.testDBFile.getParent.toFile.mkdirs()
 
     "if the database doesn't exist" - {

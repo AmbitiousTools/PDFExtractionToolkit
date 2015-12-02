@@ -8,19 +8,29 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object DAOTestUtils {
-  private val config: Config = ConfigFactory.load()
+  private val applicationConfig: Config = ConfigFactory.load()
 
-  private val testDBPath: String = config.getString("testDB.path")
+  private val workingDirPathFromConfig: String = applicationConfig.getString("workingDir")
 
-  val testConfigName: String = "testDB"
+  def createAndGetWorkingDirectory(): Path = {
+    val workingDir: Path = Paths.get(workingDirPathFromConfig)
 
-  val testDBFile: Path = Paths.get(testDBPath)
+    workingDir.toFile.mkdirs()
+
+    workingDir
+  }
+
+  private val testDBPathFromConfig: String = applicationConfig.getString("testDB.path")
+
+  val testDBFile: Path = Paths.get(testDBPathFromConfig)
+
+  val testDBConfigName: String = "testDB"
 
   def constructCleanRootDAO: RootDAO = {
     Files.deleteIfExists(testDBFile)
     DAOTestUtils.testDBFile.getParent.toFile.mkdirs()
 
-    val rootDAO: RootDAO = RootDAO.forConfigName(testConfigName)
+    val rootDAO: RootDAO = RootDAO.forConfigName(testDBConfigName)
 
     Await.result(rootDAO.initialiseIfNeeded(), 30.seconds)
 
