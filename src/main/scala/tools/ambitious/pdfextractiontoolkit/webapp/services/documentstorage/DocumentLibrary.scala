@@ -2,17 +2,19 @@ package tools.ambitious.pdfextractiontoolkit.webapp.services.documentstorage
 
 import java.net.URL
 
+import scala.concurrent.Future
+
 /**
  * A globally available interface for manipulating the applications stored set of Documents.
  */
 trait DocumentLibrary {
 
-  def store(description: DocumentDescription, documentSource: URL): DocumentIdentifier
+  def store(description: DocumentDescription, documentSource: URL): Future[DocumentIdentifier]
 
-  def retrieve(docID: DocumentIdentifier): URL
+  def retrieve(docID: DocumentIdentifier): Future[URL]
 
-  def delete(docID: DocumentIdentifier)
+  def delete(docID: DocumentIdentifier): Future[Unit]
 
-  def list(): Seq[DocumentIdentifier]
+  def list(): Future[Seq[DocumentIdentifier]]
 
 }

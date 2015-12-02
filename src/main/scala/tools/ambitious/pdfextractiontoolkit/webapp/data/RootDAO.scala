@@ -1,10 +1,15 @@
 package tools.ambitious.pdfextractiontoolkit.webapp.data
 
-import scala.concurrent.Future
 import slick.driver.SQLiteDriver.api.Database
 
-private[data] trait ToolkitDAO {
+import scala.concurrent.Future
+
+private[data] trait RootDAO {
   def database: Database
 
   def initialiseIfNeeded(): Future[Unit]
+}
+
+private[data] object RootDAO {
+  def forConfigName(configName: String): RootDAO = new RootDAOImpl(configName)
 }

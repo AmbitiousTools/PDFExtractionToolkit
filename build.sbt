@@ -2,9 +2,11 @@ name := "PDFExtractionToolkit"
 
 version := "1.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 sbtVersion := "0.13.7"
+
+parallelExecution in Test := false
 
 resolvers ++= Seq(
   "artifactory.ambitious.tools" at "http://artifactory.ambitious.tools/artifactory/libs-snapshot-local",

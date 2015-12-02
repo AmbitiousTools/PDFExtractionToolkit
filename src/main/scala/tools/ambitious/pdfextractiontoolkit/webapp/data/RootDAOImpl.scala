@@ -3,11 +3,11 @@ package tools.ambitious.pdfextractiontoolkit.webapp.data
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable
 import tools.ambitious.pdfextractiontoolkit.webapp.data.model.Documents
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-private[data] class ToolkitDAOImpl(databaseConfigName: String) extends ToolkitDAO {
+private[data] class RootDAOImpl(databaseConfigName: String) extends RootDAO {
   val database = Database.forConfig(databaseConfigName)
 
   private def isInitialised: Future[Boolean] =

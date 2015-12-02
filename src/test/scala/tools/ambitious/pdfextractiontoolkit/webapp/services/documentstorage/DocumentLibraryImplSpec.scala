@@ -5,14 +5,19 @@ import java.net.URL
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.FreeSpec
 import tools.ambitious.pdfextractiontoolkit.Resources
+import tools.ambitious.pdfextractiontoolkit.webapp.data.DocumentInformationDao
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
 
   s"a ${DocumentLibraryImpl.getClass.getSimpleName}" - {
     val mockFileStore: DocumentFileStore = mock[DocumentFileStore]
-    val stubDao: DocumentInformationDao = stub[DocumentInformationDao]
+    val mockDao: DocumentInformationDao = mock[DocumentInformationDao]
 
-    val documentLibrary: DocumentLibraryImpl = new DocumentLibraryImpl(mockFileStore, stubDao)
+    val documentLibrary: DocumentLibraryImpl = new DocumentLibraryImpl(mockFileStore, mockDao)
 
     val description: DocumentDescription = DocumentDescription.withTitle("testTitle")
     val source: URL = Resources.quickBrownFoxTxt
@@ -24,31 +29,28 @@ class DocumentLibraryImplSpec extends FreeSpec with MockFactory {
     "will store a document when store is called" in {
 
       (mockFileStore.storeFileFor _).expects(expectedID, source)
+      (mockDao.storeDocumentID _).expects(expectedID).returns(Future(Unit))
 
-      documentLibrary.store(description, source)
-
-      (stubDao.storeDocumentID _).verify(expectedID)
+      Await.result(documentLibrary.store(description, source), 30.seconds)
     }
 
     "will retrieve a document when retrieve is called" in {
-      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(source)
+      (mockFileStore.retrieveFileFor _).expects(expectedID).returns(Future(source))
 
-      assert(documentLibrary.retrieve(expectedID) == source)
+      val retrievedDocument = Await.result(documentLibrary.retrieve(expectedID), 30.seconds)
+      assert(retrievedDocument == source)
     }
 
     "will delete a document when delete is called" in {
       (mockFileStore.deleteFileFor _).expects(expectedID)
+      (mockDao.deleteDocumentID _).expects(expectedID).returns(Future(Unit))
 
-      documentLibrary.delete(expectedID)
-
-      (stubDao.deleteDocumentID _).verify(expectedID)
+      Await.result(documentLibrary.delete(expectedID), 30.seconds)
     }
 
     "will list all documents when list is called" in {
-
-      documentLibrary.list()
-
-      (stubDao.retrieveAllIDs _).verify()
+      (mockDao.retrieveAllIDs _).expects().returns(Future(Seq()))
+      Await.result(documentLibrary.list(), 30.seconds)
     }
   }
 
