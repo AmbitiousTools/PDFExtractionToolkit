@@ -42,3 +42,5 @@ libraryDependencies ++= Seq(
 )
 
 Revolver.settings: Seq[sbt.Def.Setting[_]]
+
+scalacOptions += "-deprecation"
