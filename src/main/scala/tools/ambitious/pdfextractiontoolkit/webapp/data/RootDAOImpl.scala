@@ -14,7 +14,7 @@ private[data] class RootDAOImpl(databaseConfigName: String) extends RootDAO {
     database.run(MTable.getTables).map(tables => tables.nonEmpty)
 
   def initialiseIfNeeded(): Future[Unit] =
-    isInitialised.flatMap(alreadyInitialised => if (!alreadyInitialised) initialise() else Future())
+    isInitialised.flatMap(alreadyInitialised => if (!alreadyInitialised) initialise() else Future(Unit))
 
   private def initialise(): Future[Unit] =
     database.run(createTablesAction)

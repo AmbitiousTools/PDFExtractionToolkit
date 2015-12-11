@@ -1,6 +1,6 @@
 package tools.ambitious.pdfextractiontoolkit.library.expensereports
 
-import org.scalatest.FreeSpec
+import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import tools.ambitious.pdfextractiontoolkit.library.extraction.extractionconstraints.FirstOccurrenceOfStringExtractionConstraint
 import tools.ambitious.pdfextractiontoolkit.library.extraction.tableextractors.RegionBasedTableExtractor
 import tools.ambitious.pdfextractiontoolkit.library.extraction.{ExtractionResult, Extractor}
@@ -10,67 +10,68 @@ import tools.ambitious.pdfextractiontoolkit.library.model.{Document, Table}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FreeSpec {
+class SummaryOfParliamentaryExpenditureByPeriodExtractionSpec extends FlatSpec with BeforeAndAfterEach {
 
-  "the tony abbott and andrew leigh reports" - {
-    val abbottTonyReport = getClass.getResource("/expenseReports/P34_ABBOTT_Tony.pdf")
-    val abbottTonyDocument = Document.fromPDFPath(abbottTonyReport)
+  val abbottTonyReport = getClass.getResource("/expenseReports/P34_ABBOTT_Tony.pdf")
+  val leighAndrewReport = getClass.getResource("/expenseReports/P34_LEIGH_Andrew.pdf")
 
-    val leighAndrewReport = getClass.getResource("/expenseReports/P34_LEIGH_Andrew.pdf")
-    val leighAndrewDocument = Document.fromPDFPath(leighAndrewReport)
+  val textToFind = "Summary of Parliamentary Expenditure by Period"
 
-    val textToFind = "Summary of Parliamentary Expenditure by Period"
-    s"when provided to an extractor with the following regions looking for '$textToFind'" - {
-      val tableRegion = Rectangle.fromCornerAndSize(PositivePoint.at(34, 138), Size.fromWidthAndHeight(540, 608))
-      val tableExtractor = RegionBasedTableExtractor.forRegion(tableRegion)
+  val tableRegion = Rectangle.fromCornerAndSize(PositivePoint.at(34, 138), Size.fromWidthAndHeight(540, 608))
+  val tableExtractor = RegionBasedTableExtractor.forRegion(tableRegion)
 
-      val textRegion = Rectangle.fromCornerAndSize(PositivePoint.at(165, 90), Size.fromWidthAndHeight(280, 25))
+  val textRegion = Rectangle.fromCornerAndSize(PositivePoint.at(165, 90), Size.fromWidthAndHeight(280, 25))
 
-      val extractionConstraint = FirstOccurrenceOfStringExtractionConstraint.withTextAndTableExtractor(textToFind, textRegion, tableExtractor)
+  val extractionConstraint = FirstOccurrenceOfStringExtractionConstraint.withTextAndTableExtractor(textToFind, textRegion, tableExtractor)
 
-      val extractor = Extractor.fromDocumentsAndConstraints(List(abbottTonyDocument, leighAndrewDocument), extractionConstraint)
+  val abbottTonyDocument = Document.fromPDFPath(abbottTonyReport)
+  val leighAndrewDocument = Document.fromPDFPath(leighAndrewReport)
 
-      val extractionResult: ExtractionResult = Await.result(extractor.extractTables, 60.seconds)
+  val extractor = Extractor.fromDocumentsAndConstraints(List(abbottTonyDocument, leighAndrewDocument), extractionConstraint)
+  val extractionResult: ExtractionResult = Await.result(extractor.extractTables, 60.seconds)
 
-      "the tony abbott document" - {
-        "should return a single table" in {
-          assert(extractionResult.getResults(abbottTonyDocument)(extractionConstraint).isDefined)
-        }
-
-        val table: Table = extractionResult(abbottTonyDocument)(extractionConstraint)
-
-        val expectedRows = 24
-        s"should have $expectedRows rows in the returned table" in {
-          assert(table.numberOfRows == expectedRows)
-        }
-
-        shouldHaveTextInTableAtRowAndColumn(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
-        shouldHaveTextInTableAtRowAndColumn(expectedText = "$628,736.33", table = table, rowNumber = 23, columnNumber = 2)
-      }
-
-      "the andrew leigh document" - {
-        "should return a single table" in {
-          assert(extractionResult.getResults(leighAndrewDocument)(extractionConstraint).isDefined)
-        }
-
-        val table: Table = extractionResult(leighAndrewDocument)(extractionConstraint)
-
-        val expectedRows = 26
-        s"should have $expectedRows rows in the returned table" in {
-          assert(table.numberOfRows == expectedRows)
-        }
-
-        shouldHaveTextInTableAtRowAndColumn(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
-        shouldHaveTextInTableAtRowAndColumn(expectedText = "$109,760.32", table = table, rowNumber = 26, columnNumber = 2)
-      }
-    }
+  "the Extractor" should "extract a single table from the Tony Abbott report" in {
+    assert(extractionResult.getResults(abbottTonyDocument)(extractionConstraint).isDefined)
   }
 
-  private def shouldHaveTextInTableAtRowAndColumn(expectedText: String, table: Table, rowNumber: Int, columnNumber: Int) = {
-    s"should return a table with the value '$expectedText' at row $rowNumber and column $columnNumber" in {
-      assert(table.getCell(rowNumber, columnNumber).text == expectedText)
-    }
+  it should "extract a single table from the Andrew Leigh report" in {
+    assert(extractionResult.getResults(leighAndrewDocument)(extractionConstraint).isDefined)
   }
 
+  val expectedRowsTonyAbbott = 24
+  it should s"extract a table from the Tony Abbott Report with $expectedRowsTonyAbbott rows" in {
+    val table: Table = extractionResult(abbottTonyDocument)(extractionConstraint)
 
+    assert(table.numberOfRows == expectedRowsTonyAbbott)
+  }
+
+  val expectedRowsAndrewLeigh = 26
+  it should s"extract a table from the Andrew Leigh Report with $expectedRowsAndrewLeigh rows" in {
+    val table: Table = extractionResult(leighAndrewDocument)(extractionConstraint)
+
+    assert(table.numberOfRows == expectedRowsAndrewLeigh)
+  }
+
+  it should "extract the expected values from the Tony Abbott report" in {
+    val table: Table = extractionResult(abbottTonyDocument)(extractionConstraint)
+
+    assertValueAtCell(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
+    assertValueAtCell(expectedText = "$628,736.33", table = table, rowNumber = 23, columnNumber = 2)
+  }
+
+  it should "extract the expected values from the Andrew Leigh report" in {
+    val table: Table = extractionResult(leighAndrewDocument)(extractionConstraint)
+
+    assertValueAtCell(expectedText = "Expenses From", table = table, rowNumber = 1, columnNumber = 2)
+    assertValueAtCell(expectedText = "$109,760.32", table = table, rowNumber = 26, columnNumber = 2)
+  }
+
+  private def assertValueAtCell(expectedText: String, table: Table, rowNumber: Int, columnNumber: Int) = {
+    assert(table.getCell(rowNumber, columnNumber).text == expectedText)
+  }
+
+  override def afterEach(): Unit = {
+    abbottTonyDocument.close()
+    leighAndrewDocument.close()
+  }
 }
