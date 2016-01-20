@@ -28,7 +28,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
   }
 
   "the document information dao" should "write one database row per stored document ID" in {
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     val allDocuments = retrieveAllDocsForIDFromDatabase(documentID)
 
@@ -36,7 +36,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
   }
 
   it should "store a stored document'sthe document's hash" in {
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     val allDocuments = retrieveAllDocsForIDFromDatabase(documentID)
 
@@ -44,7 +44,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
   }
 
   it should "store the document's title" in {
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     val allDocuments = retrieveAllDocsForIDFromDatabase(documentID)
 
@@ -52,7 +52,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
   }
 
   it should "store the document's description" in {
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     val allDocuments = retrieveAllDocsForIDFromDatabase(documentID)
 
@@ -60,7 +60,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
   }
 
   it should "store the document's media type" in {
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     val allDocuments = retrieveAllDocsForIDFromDatabase(documentID)
 
@@ -75,7 +75,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
 
   it should "retrieve one identifier from an identifer table with one record" in {
     Given("one document has been stored in the database")
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     When("the document IDs are retrieved from the dao")
     val allDocIDs: Seq[DocumentIdentifier] = retrieveAllDocumentIDsFromDao()
@@ -86,7 +86,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
 
   it should "retrieve the correct document ID" in {
     Given("one document has been stored in the database")
-    storeDocumentUsingDao(documentID)
+    storeDocumentIDUsingDao(documentID)
 
     When("the document IDs are retrieved from the dao")
     val allDocIDs: Seq[DocumentIdentifier] = retrieveAllDocumentIDsFromDao()
@@ -97,9 +97,33 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
     assert(retrievedDocID == documentID)
   }
 
-  def storeDocumentUsingDao(documentID: DocumentIdentifier): Unit = {
-    Await.result(dao.storeDocumentID(documentID), 30.seconds)
+  it should "delete a stored document ID" in {
+    Given("one document has been stored in the database")
+    storeDocumentIDUsingDao(documentID)
+
+    When("the document ID is deleted")
+    deleteDocumentIDUsingDao(documentID)
+
+    Then("the document ID should not be in the list of returned document ID's from the dao")
+    val retrievedDocumentIDs: Seq[DocumentIdentifier] = retrieveAllDocumentIDsFromDao()
+
+    assert(!retrievedDocumentIDs.contains(documentID))
   }
+
+  it should "throw a Document Identifier Missing exception when asked to delete an absent document ID" in {
+    Given("there are no documents in the database")
+
+    When("the document is deleted")
+    val expectedException = intercept[DocumentIdentifierMissingException] {
+      deleteDocumentIDUsingDao(documentID)
+    }
+
+    Then("a Document Identifier Missing exception is thrown")
+    assert(expectedException.getMessage === s"${documentID.toString()} could not be found.")
+  }
+
+  def storeDocumentIDUsingDao(documentID: DocumentIdentifier): Unit =
+    Await.result(dao.storeDocumentID(documentID), 30.seconds)
 
   def retrieveAllDocsForIDFromDatabase(documentID: DocumentIdentifier): Seq[Document] = {
     val tableQuery: TableQuery[Documents] = new TableQuery(new Documents(_))
@@ -112,4 +136,7 @@ class DocumentInformationDaoSpec extends AmbitiousToolsSpec {
     val allDocumentIDs: Seq[DocumentIdentifier] = Await.result(dao.retrieveAllIDs(), 30.seconds)
     allDocumentIDs
   }
+
+  def deleteDocumentIDUsingDao(documentID: DocumentIdentifier): Unit =
+    Await.result(dao.deleteDocumentID(documentID), 30.seconds)
 }

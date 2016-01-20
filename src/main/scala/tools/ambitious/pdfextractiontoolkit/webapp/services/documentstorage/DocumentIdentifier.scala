@@ -4,6 +4,8 @@ import tools.ambitious.pdfextractiontoolkit.utils.AmbitiousIoUtils.ByteArrayUtil
 
 case class DocumentIdentifier protected(hash: String,
                                         description: DocumentDescription) {
+
+  override def toString: String = s"Document Identifier: $hash"
 }
 
 object DocumentIdentifier {
