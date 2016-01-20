@@ -1,7 +1,7 @@
 package tools.ambitious.pdfextractiontoolkit.webapp.data
 
 import slick.driver.SQLiteDriver.api._
-import slick.lifted.TableQuery
+import slick.lifted.{Query, TableQuery}
 import tools.ambitious.pdfextractiontoolkit.webapp.data.model.{Document, Documents}
 import tools.ambitious.pdfextractiontoolkit.webapp.services.documentstorage.DocumentIdentifier
 
@@ -24,5 +24,13 @@ private class DocumentInformationDaoImpl(val rootDAO: RootDAO) extends DocumentI
 
   override def deleteDocumentID(docID: DocumentIdentifier): Future[Unit] = ???
 
-  override def retrieveAllIDs(): Future[Seq[DocumentIdentifier]] = ???
+  override def retrieveAllIDs(): Future[Seq[DocumentIdentifier]] = {
+    val tableQuery: TableQuery[Documents] = new TableQuery(new Documents(_))
+
+    val query: Query[Documents, Document, Seq] = tableQuery.map(row => row)
+
+    val resultsFuture: Future[Seq[Document]] = rootDAO.database.run(query.result)
+
+    resultsFuture.map(documents => documents.map(_.asDocumentIdentifier))
+  }
 }
